@@ -81,7 +81,15 @@ namespace Abracodabra.Ecosystem {
             }
 
             if (doris != null) {
-                foreach (var plant in LivingPlantsInGridOrder()) {
+                List<PlantGrowth> plants = LivingPlantsInGridOrder();
+
+                // Pacing: one fruit at a time, but the whole supper stays within maxSupperSeconds.
+                int expectedFruit = CountFruitCells(plants);
+                float secondsPerFruit = expectedFruit > 0
+                    ? Mathf.Max(0.05f, Mathf.Min(rules.secondsPerFruit, rules.maxSupperSeconds / expectedFruit))
+                    : rules.secondsPerFruit;
+
+                foreach (var plant in plants) {
                     if (plant == null || plant.CurrentState == PlantState.Dead) continue;
 
                     var fruitObjects = new List<GameObject>();
@@ -96,7 +104,7 @@ namespace Abracodabra.Ecosystem {
                     }
 
                     for (int i = 0; i < items.Count; i++) {
-                        yield return Fly(flyers[i], doris.MouthWorldPosition, rules);
+                        yield return Fly(flyers[i], doris.MouthWorldPosition, secondsPerFruit, rules);
                         if (flyers[i] != null) Destroy(flyers[i]);
 
                         float nutrition = items[i].GetNutritionValue();
@@ -178,8 +186,19 @@ namespace Abracodabra.Ecosystem {
             return flyer;
         }
 
-        static IEnumerator Fly(GameObject flyer, Vector3 target, DuskRules rules) {
-            float duration = Mathf.Max(0.05f, rules.secondsPerFruit);
+        static int CountFruitCells(List<PlantGrowth> plants) {
+            int count = 0;
+            foreach (var plant in plants) {
+                if (plant == null || plant.CellManager == null) continue;
+                foreach (var cell in plant.CellManager.cells) {
+                    if (cell.Value == PlantCellType.Fruit) count++;
+                }
+            }
+            return count;
+        }
+
+        static IEnumerator Fly(GameObject flyer, Vector3 target, float seconds, DuskRules rules) {
+            float duration = Mathf.Max(0.05f, seconds);
             if (flyer == null || flyer.GetComponent<SpriteRenderer>() == null) {
                 yield return new WaitForSeconds(duration);
                 yield break;

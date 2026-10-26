@@ -25,6 +25,7 @@ MonoBehaviour:
   maxPlantsEatenPerDay: 1
   eatsPlantAtBellyPips: 0
   secondsPerFruit: 0.3
+  maxSupperSeconds: 8
   fruitArcHeight: 1.2
   fruitFlightScale: 5
   holdAfterSupper: 0.8

@@ -51,6 +51,10 @@ namespace WegoSystem {
         [Tooltip("Seconds each fruit takes to fly to Doris (one at a time).")]
         [Min(0.05f)] public float secondsPerFruit = 0.3f;
 
+        [Tooltip("Supper never takes longer than this: with many fruit each one flies faster " +
+                 "(min(secondsPerFruit, maxSupperSeconds / fruit), at least 0.05 s).")]
+        [Min(1f)] public float maxSupperSeconds = 8f;
+
         [Tooltip("Height of the fruit's arc, in world units.")]
         [Min(0f)] public float fruitArcHeight = 1.2f;
 
