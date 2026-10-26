@@ -61,6 +61,12 @@ public class PlayerActionManager : MonoBehaviour {
                 var seedItem = actionData as UIInventoryItem;
                 // Check if minigame will handle this
                 if (ShouldUseMinigameForPlanting()) {
+                    // B0: a planting minigame is already running for another click. Falling through
+                    // to the immediate path would plant a second time (and consume a second seed).
+                    if (MinigameManager.Instance.IsMinigameActive) {
+                        if (debugMode) Debug.Log("[PlayerActionManager] PlantSeed ignored: planting minigame already active");
+                        return false;
+                    }
                     success = ExecutePlantSeedWithMinigame(gridPosition, seedItem, onSuccessCallback);
                     if (success) {
                         // Minigame started - it will handle tick advancement and seed consumption

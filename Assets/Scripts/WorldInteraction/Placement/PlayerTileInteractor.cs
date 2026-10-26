@@ -37,14 +37,19 @@ public sealed class PlayerTileInteractor : MonoBehaviour {
         if (FoodSelectionPopup.IsBlockingInput)
             return;
 
+        // B0: the click that hits the timing circle belongs to the minigame, not to the world.
+        // Without this guard it also reached HandleSeedPlanting and planted a second time.
+        if (IsMinigameActive())
+            return;
+
         if (Input.GetMouseButtonDown(0)) pendingLeftClick = true;
         if (Input.GetMouseButtonDown(1)) pendingRightClick = true;
     }
 
     void LateUpdate()
     {
-        // Block click processing while feeding popup is open
-        if (FoodSelectionPopup.IsBlockingInput)
+        // Block click processing while feeding popup is open or a minigame owns the mouse
+        if (FoodSelectionPopup.IsBlockingInput || IsMinigameActive())
         {
             pendingLeftClick = false;
             pendingRightClick = false;
@@ -62,6 +67,11 @@ public sealed class PlayerTileInteractor : MonoBehaviour {
             pendingRightClick = false;
             HandleRightClick();
         }
+    }
+
+    static bool IsMinigameActive() {
+        return Abracodabra.Minigames.MinigameManager.Instance != null &&
+               Abracodabra.Minigames.MinigameManager.Instance.IsMinigameActive;
     }
 
     void HandleRightClick() {
