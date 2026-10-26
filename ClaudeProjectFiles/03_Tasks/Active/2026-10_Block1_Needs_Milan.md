@@ -2,6 +2,19 @@
 
 One dated bullet per item: what, why, what was done instead. Newest at the bottom. Close an item by striking it through and writing the answer.
 
+## ☀ Morning summary (2026-10-26, overnight run, written by the orchestrator)
+
+1. **Batches B0, B1, B2, B3 all passed** (B0 Sonnet, B1 Opus, B2 Sonnet, B3 Opus xhigh). The run stopped after B3 as planned: Checkpoint A needs you.
+2. **Commits on `block1/doris-by-dusk`** (nothing pushed): B0 `2585c97` `4fbf5b5` `bb4ab72`; B1 `15fc44d` `161fa26` `cd0e66e`; B2 `b6a7bba` `10577f1`; B3 `aec3aaf` `5a3a1a7` `a542f57` `d0e1b4c` `54ca1e5` `5fb95ae` `9e4d348` `e2bda58`. Console after B3: 0 errors. `TileMappingsBackup.json` is left uncommitted (Unity re-saves it every Play).
+3. **Findings:** plants do grow on 6.3 (Mature at tick ~9–13). The smoke test saw nothing because the Day starts paused (Space). The double plant action is fixed; dead plants are now destroyed; fauna was not gated and is now.
+4. **Built:** Planning-tick invariant (F9 readout), Planning-only clicks and WASD, `DuskRules` asset, belly pips above Doris, supper at dusk, win/lose with a sticky end and overlay, working Restart, waves for all five rounds. All of it was proven by script in Play mode.
+5. **Beyond the pack:** a garden view in Planning (G / VIEW GARDEN, commit `9e4d348`, revert to drop); a fixed Restart (it was broken); new `RunState.Dusk`.
+6. **Before you play (2 edits):** (a) `StartingInventory_000` has ONE seed, so add 3 more Starter Seeds or a run is one plant; (b) untick Start Paused on `ExecutionPhaseDriver` in `SampleScene`, or press Space after START DAY. Details in the B3 section below.
+7. **Checkpoint A (you, ~10 min):** play one run to its end and write one line in `02_Design/Feedback_Log.md`: could I tell why I won or lost?
+8. **Check by eye:** F9 readout, the pips and hover box, supper fruit flight, the end card, a real mouse and keys in Planning vs the Day.
+9. **Decide:** Doris's drain 0.5/tick in `DuskRules` (the asset says 2); the check order at dusk; wet dirt drying only in the Day.
+10. **Next:** B4 (waves on the map; fix or drop the deer prefab, which still has no `AnimalDefinition`; rounds 2–3 are brutal) only after Checkpoint A.
+
 ## B0 (2026-10-26, unattended)
 
 - **2026-10-26 · The Day starts paused (decide: keep or flip).** `ExecutionPhaseDriver` in `SampleScene` has `startPaused: 1` (the same value on tag `pre-unity-6.3`, so not a 6.3 regression). After START DAY nothing ticks until you press **Space**: plants do not grow, waves do not move. This is the real reason the 2026-10-05 smoke test "saw no growth". Why it needs you: it is a scene change, and the pack calls the Day "hands off"; a Day that waits for a keypress contradicts B2's banner text and the playtest sheet's item 3. Done instead: left the scene alone; the CLI tests call `ExecutionPhaseDriver.SetPaused(false)` (same as Space). Recommendation: in `SampleScene` select the object with `ExecutionPhaseDriver`, untick **Start Paused**, commit it alone as `scene: …`; or tell me and a later batch does it.
