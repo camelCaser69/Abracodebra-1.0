@@ -28,7 +28,10 @@ public class PlantWorldUI : MonoBehaviour {
     void LateUpdate() {
         if (plant == null || plant.EnergySystem == null) return;
         if (plant.CurrentState == PlantState.Dead) {
-            gameObject.SetActive(false);
+            // B0: this component lives on the plant's own GameObject. Deactivating gameObject here
+            // stopped PlantGrowth.DeathSequence (a coroutine), so a dead plant was never destroyed
+            // and its tile never freed. Hide only the energy bar.
+            if (energyBarRoot != null && energyBarRoot.gameObject.activeSelf) energyBarRoot.gameObject.SetActive(false);
             return;
         }
 
