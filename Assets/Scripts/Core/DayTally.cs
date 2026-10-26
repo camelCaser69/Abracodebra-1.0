@@ -88,6 +88,11 @@ namespace WegoSystem {
             return string.Format(CultureInfo.InvariantCulture, "Events this Day: {0} in {1:0} s", EventCount, DaySeconds);
         }
 
+        /// <summary>The parts of EventCount, short: "bite 6 · kill 1 · scare 0 · lost 1 · Doris 0 · fruit 15".</summary>
+        public static string BreakdownLine() {
+            return $"bite {Bites} · kill {Kills} · scare {Repels} · lost {plantsLost} · Doris {dorisAte} · fruit {fruitSet}";
+        }
+
         /// <summary>One line with every counter, for checks and the ledger: "bites Bunny 3 · kills Bunny 1 (Thorns 1) · ...".</summary>
         public static string Summary() {
             var sb = new StringBuilder();

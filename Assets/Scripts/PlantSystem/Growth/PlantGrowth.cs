@@ -699,7 +699,8 @@ namespace Abracodabra.Genes
                 FloatingCombatText.Spawn(
                     eatenCell.transform.position + Vector3.up * 0.2f,
                     $"-1 leaf · {biter.ToLowerInvariant()}",
-                    new Color(1f, 0.86f, 0.55f)
+                    new Color(1f, 0.86f, 0.55f),
+                    3.2f
                 );
 
                 if (!destroyedLeafPositions.Contains(eatenCell.GridCoord))

@@ -504,7 +504,8 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
         FloatingCombatText.Spawn(
             transform.position + Vector3.up * 0.4f,
             string.IsNullOrEmpty(lastDamageSource) ? $"{SpeciesName.ToLowerInvariant()} down" : $"{SpeciesName.ToLowerInvariant()} down · {lastDamageSource}",
-            new Color(0.80f, 0.90f, 0.95f)
+            new Color(0.80f, 0.90f, 0.95f),
+            3.2f
         );
 
         if (GridDebugVisualizer.Instance != null)

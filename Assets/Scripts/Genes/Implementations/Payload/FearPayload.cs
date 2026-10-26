@@ -53,7 +53,8 @@ namespace Abracodabra.Genes.Implementations
                 FloatingCombatText.Spawn(
                     animalController.transform.position + Vector3.up * 0.4f,
                     $"{animalController.SpeciesName.ToLowerInvariant()} flees · {fearName}",
-                    new Color(0.80f, 0.90f, 0.95f)
+                    new Color(0.80f, 0.90f, 0.95f),
+                    3.2f
                 );
             }
 

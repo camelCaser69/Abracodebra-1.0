@@ -34,6 +34,22 @@ public class FloatingCombatText : MonoBehaviour
         return fct;
     }
 
+    /// <summary>
+    /// B5: a bigger label with a dark outline, for text the player has to read at a glance
+    /// (who bit which leaf, what scared or killed a pest).
+    /// </summary>
+    public static FloatingCombatText Spawn(Vector3 worldPosition, string text, Color color, float size)
+    {
+        var fct = Spawn(worldPosition, text, color);
+        if (fct != null && fct.tmp != null)
+        {
+            fct.tmp.fontSize = size;
+            fct.tmp.outlineWidth = 0.22f;
+            fct.tmp.outlineColor = new Color32(18, 26, 18, 255);
+        }
+        return fct;
+    }
+
     void Setup(string text, Color color)
     {
         startColor = color;
