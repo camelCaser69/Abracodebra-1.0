@@ -74,8 +74,13 @@ namespace WegoSystem {
         [Tooltip("Pause the Day the first time Doris eats a plant in a run.")]
         public bool autoPauseDorisFirstEat = true;
 
+        [Header("Dusk ledger (B6)")]
+        [Tooltip("After supper the dusk ledger waits for Continue before the dusk check is applied. " +
+                 "Off = the check is applied at once (scripted runs). With no ledger UI in the scene it is applied at once either way.")]
+        public bool ledgerWaitsForContinue = true;
+
         [Header("Player")]
-        [Tooltip("D4: player starvation does not end the run in Block 1.")]
+        [Tooltip("D4: player starvation does not end the run in Block 1. While off, the HUD hides the player HUNGER bar (B6).")]
         public bool playerStarvationEndsRun = false;
 
         [Header("End texts")]

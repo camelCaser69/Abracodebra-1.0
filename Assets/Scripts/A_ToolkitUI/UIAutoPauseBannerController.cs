@@ -4,7 +4,7 @@
 //  the run, a plant died, Doris's first plant-eat: DayTally, D6) this strip at the
 //  top edge says why, and how to go on. It hides as soon as the Day runs again
 //  (Space) or leaves the Day. Lives in the HUD panel; it never covers the ground
-//  and never takes mouse input. B6 replaces it with the proper phase banner.
+//  and never takes mouse input. B6's phase banner owns the very top; this sits just below it.
 // ============================================================================
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -33,7 +33,7 @@ namespace Abracodabra.UI.Toolkit {
    strip.style.position = Position.Absolute;
    strip.style.left = 0;
    strip.style.right = 0;
-   strip.style.top = 8;
+   strip.style.top = UIPhaseBannerController.Height + 8; // B6: below the phase banner
    strip.style.alignItems = Align.Center;
    strip.style.display = DisplayStyle.None;
 

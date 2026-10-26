@@ -22,6 +22,12 @@ using UnityEngine;
 using Abracodabra.Genes;
 
 namespace WegoSystem {
+    /// <summary>A plant the Day took (B6 ledger). cause: a pest species ("bunny") or "Doris"; empty when unknown.</summary>
+    public struct LostPlant {
+        public string name;
+        public string cause;
+    }
+
     public static class DayTally {
         // Per Day
         static readonly Dictionary<string, int> bitesBySpecies = new Dictionary<string, int>();
@@ -29,6 +35,7 @@ namespace WegoSystem {
         static readonly Dictionary<string, int> killsBySource = new Dictionary<string, int>();
         static readonly Dictionary<string, int> repelsBySpecies = new Dictionary<string, int>();
         static readonly Dictionary<int, string> lastBiterByPlant = new Dictionary<int, string>();
+        static readonly List<LostPlant> lostPlants = new List<LostPlant>();
         static int plantsLost;
         static int dorisAte;
         static int fruitSet;
@@ -55,6 +62,7 @@ namespace WegoSystem {
         public static int PlantsLost => plantsLost;
         public static int DorisAtePlants => dorisAte;
         public static int FruitSet => fruitSet;
+        public static IReadOnlyList<LostPlant> LostPlants => lostPlants;
 
         /// <summary>The density test's number: bites + kills + repels + plant deaths + Doris eats + fruit set.</summary>
         public static int EventCount => Bites + Kills + Repels + plantsLost + dorisAte + fruitSet;
@@ -113,6 +121,54 @@ namespace WegoSystem {
             return string.Join(", ", parts);
         }
 
+        // ── Ledger parts (B6) ────────────────────────────────────────
+
+        /// <summary>Bites per species, biggest first: "bunnies 6, foxes 3" (empty when nobody bit).</summary>
+        public static string BiteBreakdown() {
+            return Breakdown(bitesBySpecies, true);
+        }
+
+        /// <summary>Kill sources the code knew, biggest first: "Thorns 1, Poison 1" (empty when none).</summary>
+        public static string KillSourceBreakdown() {
+            return Breakdown(killsBySource, false);
+        }
+
+        /// <summary>Plants the Day took, grouped: "Sunfern, to rabbits; 2 Starter Seed, eaten by Doris" (empty when none).</summary>
+        public static string LostPlantsBreakdown() {
+            var counts = new List<KeyValuePair<LostPlant, int>>();
+            foreach (var lost in lostPlants) {
+                int at = counts.FindIndex(c => c.Key.name == lost.name && c.Key.cause == lost.cause);
+                if (at < 0) counts.Add(new KeyValuePair<LostPlant, int>(lost, 1));
+                else counts[at] = new KeyValuePair<LostPlant, int>(counts[at].Key, counts[at].Value + 1);
+            }
+
+            var parts = new List<string>();
+            foreach (var c in counts) {
+                string text = c.Value > 1 ? c.Value + "x " + c.Key.name : c.Key.name;
+                if (c.Key.cause == "Doris") text += ", eaten by Doris";
+                else if (!string.IsNullOrEmpty(c.Key.cause)) text += ", to " + Plural(c.Key.cause, 2);
+                parts.Add(text);
+            }
+            return string.Join("; ", parts);
+        }
+
+        static string Breakdown(Dictionary<string, int> map, bool pluralKeys) {
+            var entries = new List<KeyValuePair<string, int>>(map);
+            entries.Sort((a, b) => a.Value != b.Value ? b.Value.CompareTo(a.Value) : string.CompareOrdinal(a.Key, b.Key));
+            var parts = new List<string>();
+            foreach (var kv in entries) parts.Add((pluralKeys ? Plural(kv.Key, 2) : kv.Key) + " " + kv.Value);
+            return string.Join(", ", parts);
+        }
+
+        static string NameOf(PlantGrowth plant) {
+            if (plant == null) return "A plant";
+            if (plant.geneRuntimeState != null && plant.geneRuntimeState.template != null && !string.IsNullOrEmpty(plant.geneRuntimeState.template.templateName)) {
+                return plant.geneRuntimeState.template.templateName;
+            }
+            if (plant.seedTemplate != null && !string.IsNullOrEmpty(plant.seedTemplate.templateName)) return plant.seedTemplate.templateName;
+            return "A plant";
+        }
+
         // ── Lifecycle ────────────────────────────────────────────────
 
         /// <summary>Dawn: the Day starts. Clears the Day's counts; round 1 also clears the per-run pause flags.</summary>
@@ -122,6 +178,7 @@ namespace WegoSystem {
             killsBySource.Clear();
             repelsBySpecies.Clear();
             lastBiterByPlant.Clear();
+            lostPlants.Clear();
             Bites = 0;
             Kills = 0;
             Repels = 0;
@@ -171,15 +228,19 @@ namespace WegoSystem {
             plantsLost++;
 
             string reason = "A plant died.";
+            string cause = "";
             if (plant != null && lastBiterByPlant.TryGetValue(plant.GetInstanceID(), out var species)) {
                 reason = $"A plant died: the {Plural(species, 2)} ate its leaves.";
+                cause = species;
             }
+            lostPlants.Add(new LostPlant { name = NameOf(plant), cause = cause });
             if (DuskRules.Active.autoPausePlantDeath) AutoPause(reason);
         }
 
-        public static void NoteDorisAtePlant() {
+        public static void NoteDorisAtePlant(PlantGrowth plant = null) {
             if (!DayRunning) return;
             dorisAte++;
+            lostPlants.Add(new LostPlant { name = NameOf(plant), cause = "Doris" });
             if (!dorisEatPauseDone) {
                 dorisEatPauseDone = true;
                 if (DuskRules.Active.autoPauseDorisFirstEat) {

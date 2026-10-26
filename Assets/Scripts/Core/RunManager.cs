@@ -60,9 +60,16 @@ namespace WegoSystem {
         public event Action<GamePhase, GamePhase> OnPhaseChanged;
         public event Action<int> OnRoundChanged;
         public event Action<RunOutcome, string> OnRunEnded;   // B3: (outcome, reason), fired once per run
+        // B6: supper is done; the dusk ledger shows the Day, and ContinueFromLedger() applies the verdict.
+        public event Action<SupperRunner.SupperResult, DuskVerdict> OnDuskLedger;
 
         SupperRunner supperRunner;
         public SupperRunner Supper => supperRunner;
+
+        // B6: the verdict waits here while the dusk ledger is on screen.
+        DuskVerdict pendingVerdict;
+        bool ledgerPending;
+        public bool AwaitingLedger => ledgerPending;
 
         // B3: the seed the next scene load uses (Restart same seed / New seed). Static, so it survives the reload.
         static bool hasPendingRunSeed;
@@ -246,6 +253,26 @@ namespace WegoSystem {
             Debug.Log($"[RunManager] Dusk {currentRoundNumber}/{rules.roundsToWin}: living plants {livingPlants}, " +
                       $"belly {bellyPips}/{rules.bellyPips} -> {verdict}");
 
+            // B6: the ledger comes first; Continue applies the verdict. No ledger UI (or the rule off) = at once.
+            if (rules.ledgerWaitsForContinue && OnDuskLedger != null) {
+                pendingVerdict = verdict;
+                ledgerPending = true;
+                OnDuskLedger.Invoke(result, verdict);
+                return;
+            }
+            ApplyVerdict(verdict);
+        }
+
+        /// <summary>B6: the player read the dusk ledger: apply the dusk check (next round, win or loss).</summary>
+        public void ContinueFromLedger() {
+            if (!ledgerPending) return;
+            ledgerPending = false;
+            if (currentState != RunState.Dusk) return;
+            ApplyVerdict(pendingVerdict);
+        }
+
+        void ApplyVerdict(DuskVerdict verdict) {
+            var rules = DuskRules.Active;
             switch (verdict) {
                 case DuskVerdict.NextRound:
                     StartNewRound();

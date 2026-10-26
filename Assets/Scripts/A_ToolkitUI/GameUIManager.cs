@@ -64,6 +64,10 @@ namespace Abracodabra.UI.Toolkit {
   UIAutoPauseBannerController autoPauseBanner;  // B5: why the Day paused itself
   public UIAutoPauseBannerController AutoPauseBanner => autoPauseBanner;
   public UIRunEndOverlayController RunEndOverlay => runEndOverlay;
+  UIPhaseBannerController phaseBanner;          // B6: PLANNING / DAY / DUSK strip with the "Now:" line
+  public UIPhaseBannerController PhaseBanner => phaseBanner;
+  UIDuskLedgerController duskLedger;            // B6: the Day in three lines, after supper
+  public UIDuskLedgerController DuskLedger => duskLedger;
 
   // Garden view (Planning): the full-screen seed editor hides the world, so planting needs a way to see it.
   const KeyCode GardenViewKey = KeyCode.G;
@@ -110,6 +114,7 @@ namespace Abracodabra.UI.Toolkit {
    }
 
    CreateStartDayButton();
+   CreatePhaseBannerAndLedger();
 
    inventoryController.PopulateGrid();
    RefreshHotbar();
@@ -118,6 +123,7 @@ namespace Abracodabra.UI.Toolkit {
 
    if (RunManager.Instance != null) {
     RunManager.Instance.OnRunStateChanged += HandleRunStateChanged;
+    RunManager.Instance.OnDuskLedger += HandleDuskLedger;
     HandleRunStateChanged(RunManager.Instance.CurrentState);
    }
    else {
@@ -145,6 +151,7 @@ namespace Abracodabra.UI.Toolkit {
    dorisBellyController?.Refresh();
    waveMarkers?.Refresh();
    autoPauseBanner?.Refresh();
+   phaseBanner?.Refresh();
   }
 
   void OnDestroy() {
@@ -158,6 +165,7 @@ namespace Abracodabra.UI.Toolkit {
 
    if (RunManager.Instance != null) {
     RunManager.Instance.OnRunStateChanged -= HandleRunStateChanged;
+    RunManager.Instance.OnDuskLedger -= HandleDuskLedger;
    }
 
    if (playerHungerSystem != null) {
@@ -266,6 +274,14 @@ namespace Abracodabra.UI.Toolkit {
 
    playerHungerBarFill = rootElement.Q<VisualElement>("player-hunger-bar-fill");
    playerHungerText = rootElement.Q<Label>("player-hunger-text");
+
+   // B6 (D4): player hunger is cut for the demo. While starvation cannot end the run the bar would
+   // still fill and turn red, so it is hidden. Hidden, not removed: the panel keeps its width, so the
+   // hotbar stays centred between it and Doris's belly.
+   var playerHungerPanel = rootElement.Q<VisualElement>("player-hunger-panel");
+   if (playerHungerPanel != null && !DuskRules.Active.playerStarvationEndsRun) {
+    playerHungerPanel.style.visibility = Visibility.Hidden;
+   }
 
    dorisHungerFooter = rootElement.Q<VisualElement>("doris-hunger-footer");
    dorisHungerBarFill = rootElement.Q<VisualElement>("doris-hunger-bar-fill");
@@ -402,6 +418,24 @@ namespace Abracodabra.UI.Toolkit {
   public void RefreshDorisReference() {
    UnsubscribeFromDoris();
    TryFindAndSubscribeToDoris();
+  }
+
+  // B6: the phase banner owns the top edge, so everything else that lived there starts below it.
+  void CreatePhaseBannerAndLedger() {
+   phaseBanner = new UIPhaseBannerController();
+   phaseBanner.Initialize(rootElement, OnStartDayClicked);
+
+   duskLedger = new UIDuskLedgerController();
+   duskLedger.Initialize(rootElement);
+
+   float below = UIPhaseBannerController.Height;
+   if (planningPanel != null) planningPanel.style.paddingTop = below;
+   var topBar = rootElement.Q<VisualElement>("hud-top-bar");
+   if (topBar != null) topBar.style.top = 15 + below;
+  }
+
+  void HandleDuskLedger(Abracodabra.Ecosystem.SupperRunner.SupperResult supper, DuskVerdict verdict) {
+   duskLedger?.Show(supper, DuskRules.Active);
   }
 
   void CreateStartDayButton() {
@@ -969,6 +1003,7 @@ namespace Abracodabra.UI.Toolkit {
    seedEditorController.SetInteractable(isPlanning);
 
    if (newState != RunState.GameOver) runEndOverlay?.Hide();
+   if (newState != RunState.Dusk) duskLedger?.Hide();
 
    switch (newState) {
     case RunState.Planning:
