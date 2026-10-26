@@ -42,6 +42,16 @@ public class WaveManager : MonoBehaviour
     private Coroutine activeSpawnCoroutine = null;
 
     public bool IsWaveActive => currentState != WaveState.Idle;
+
+    // B3: DuskRules owns the season's waves (element 0 = round 1); the scene list is the fallback.
+    List<WaveDefinition> ActiveWaves
+    {
+        get
+        {
+            var rules = DuskRules.Active;
+            return rules.waves != null && rules.waves.Count > 0 ? rules.waves : wavesSequence;
+        }
+    }
     // A3: rounds end on a survive-the-timer basis (the wave window elapsed), not on
     // killing every pest. Named honestly to match behavior.
     public bool IsWaveTimerComplete() => currentState == WaveState.Idle && currentWaveIndex >= 0;
@@ -134,19 +144,12 @@ public class WaveManager : MonoBehaviour
 
         currentWaveIndex = roundNumber - 1;
 
-        if (!IsValidWaveIndex(currentWaveIndex))
-        {
-            Debug.LogWarning($"[WaveManager] No wave definition for round {roundNumber}");
-            currentState = WaveState.Idle;
-            return;
-        }
-
-        currentWaveDef = wavesSequence[currentWaveIndex];
+        // B3: a round without a wave still has a Day (the timer runs, nothing spawns).
+        // Before, it went straight to Idle and nothing ever ended the Day.
+        currentWaveDef = IsValidWaveIndex(currentWaveIndex) ? ActiveWaves[currentWaveIndex] : null;
         if (currentWaveDef == null)
         {
-            Debug.LogError($"[WaveManager] Wave definition at index {currentWaveIndex} is null!");
-            currentState = WaveState.Idle;
-            return;
+            Debug.LogWarning($"[WaveManager] No wave definition for round {roundNumber}: the Day runs without pests.");
         }
 
         StartWave();
@@ -172,10 +175,10 @@ public class WaveManager : MonoBehaviour
 
         waveSpawnTick = waveStartTick + Mathf.RoundToInt(waveDurationTicks * spawnTimeNormalized);
 
-        hasSpawnedThisWave = false;
+        hasSpawnedThisWave = currentWaveDef == null; // B3: nothing to spawn in a wave-less Day
         currentState = WaveState.Active;
 
-        Debug.Log($"[WaveManager] Starting wave '{currentWaveDef.waveName}' " +
+        Debug.Log($"[WaveManager] Starting wave '{(currentWaveDef != null ? currentWaveDef.waveName : "(none)")}' " +
                   $"Duration: {waveDurationTicks} ticks ({waveDurationInDays} days) " +
                   $"Spawn at tick: {waveSpawnTick}");
     }
@@ -275,9 +278,10 @@ public class WaveManager : MonoBehaviour
 
     private bool IsValidWaveIndex(int index)
     {
-        return wavesSequence != null &&
+        var waves = ActiveWaves;
+        return waves != null &&
                index >= 0 &&
-               index < wavesSequence.Count;
+               index < waves.Count;
     }
 
     void Update()

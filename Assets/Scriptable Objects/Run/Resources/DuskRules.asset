@@ -13,7 +13,12 @@ MonoBehaviour:
   m_Name: DuskRules
   m_EditorClassIdentifier: 
   roundsToWin: 5
-  waves: []
+  waves:
+  - {fileID: 11400000, guid: 6d4d58a9961c6e849a27fabd71bd5178, type: 2}
+  - {fileID: 11400000, guid: a909bf6355795ac449bba998b4b3a520, type: 2}
+  - {fileID: 11400000, guid: 9e60f0d1229ac84428e236e7fcf30de5, type: 2}
+  - {fileID: 11400000, guid: a18c483a4012dcf4c860759e70b63d51, type: 2}
+  - {fileID: 11400000, guid: a463ec292d47b6a4c94ca9653e7ff5dc, type: 2}
   bellyPips: 8
   dorisHungerPerTick: 0.5
   hungerRampPerRound: 0.15
