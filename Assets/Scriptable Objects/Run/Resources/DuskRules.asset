@@ -18,6 +18,7 @@ MonoBehaviour:
   dorisHungerPerTick: 0.5
   hungerRampPerRound: 0.15
   maxPlantsEatenPerDay: 1
+  eatsPlantAtBellyPips: 0
   secondsPerFruit: 0.3
   fruitArcHeight: 1.2
   fruitFlightScale: 3

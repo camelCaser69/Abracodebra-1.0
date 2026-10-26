@@ -39,12 +39,31 @@ namespace Abracodabra.Ecosystem
         public event Action<PlantGrowth> OnDorisAtePlant;
         public event Action<float> OnDorisFed;
         public event Action<ConsumableData, float> OnFed;
+        public event Action<bool> OnHoverChanged;                     // B3: (isHovered), drives the belly hover
 
         // Properties
         public DorisDefinition Definition => definition;
         public DorisHungerSystem HungerSystem => hungerSystem;
         public MultiTileEntity MultiTileEntity => multiTileEntity;
         public int PlantsEatenToday => plantsEatenToday;
+        public bool IsHovered => isHovered;
+
+        /// <summary>B3: top centre of Doris's sprite; the belly pips sit here.</summary>
+        public Vector3 BellyAnchorWorldPosition
+        {
+            get
+            {
+                if (spriteRenderer != null)
+                {
+                    Bounds b = spriteRenderer.bounds;
+                    return new Vector3(b.center.x, b.max.y, transform.position.z);
+                }
+                return transform.position + feedPopupOffset;
+            }
+        }
+
+        /// <summary>B3: where supper's fruit flies to (the middle of her sprite).</summary>
+        public Vector3 MouthWorldPosition => spriteRenderer != null ? spriteRenderer.bounds.center : transform.position;
 
         #region IWorldInteractable Implementation
 
@@ -146,6 +165,11 @@ namespace Abracodabra.Ecosystem
             {
                 RunManager.Instance.OnRunStateChanged += HandleRunStateChanged;
             }
+        }
+
+        void Update()
+        {
+            UpdateHover();
         }
 
         void OnDestroy()
@@ -292,6 +316,9 @@ namespace Abracodabra.Ecosystem
                 spriteRenderer.color = hoverColor;
             }
 
+            // B3: the belly readout shows its explanation while Doris is hovered
+            OnHoverChanged?.Invoke(true);
+
             if (debugLog)
             {
                 Debug.Log("[DorisController] Hover entered");
@@ -303,10 +330,29 @@ namespace Abracodabra.Ecosystem
             isHovered = false;
             UpdateVisualState();
 
+            OnHoverChanged?.Invoke(false);
+
             if (debugLog)
             {
                 Debug.Log("[DorisController] Hover exited");
             }
+        }
+
+        /// <summary>
+        /// B3: nothing called OnHoverEnter/Exit before; Doris now follows the hovered cell
+        /// (TileInteractionManager tracks it every frame, in every phase).
+        /// </summary>
+        void UpdateHover()
+        {
+            bool over = false;
+            if (TileInteractionManager.HasInstance && multiTileEntity != null)
+            {
+                Vector3Int? cell = TileInteractionManager.Instance.CurrentlyHoveredCell;
+                over = cell.HasValue && multiTileEntity.OccupiesPosition(new GridPosition(cell.Value));
+            }
+
+            if (over && !isHovered) OnHoverEnter();
+            else if (!over && isHovered) OnHoverExit();
         }
 
         void OnClickedWithHands(GameObject interactor)
@@ -405,8 +451,11 @@ namespace Abracodabra.Ecosystem
         {
             if (definition == null) return;
 
-            // B3 mercy cap: at most DuskRules.maxPlantsEatenPerDay plants a Day
-            if (plantsEatenToday >= DuskRules.Active.maxPlantsEatenPerDay) return;
+            // B3 mercy cap: at most DuskRules.maxPlantsEatenPerDay plants a Day,
+            // and only once the belly is down to DuskRules.eatsPlantAtBellyPips (0)
+            var rules = DuskRules.Active;
+            if (plantsEatenToday >= rules.maxPlantsEatenPerDay) return;
+            if (hungerSystem != null && hungerSystem.BellyPips > rules.eatsPlantAtBellyPips) return;
 
             ticksSinceLastPlantEat++;
 

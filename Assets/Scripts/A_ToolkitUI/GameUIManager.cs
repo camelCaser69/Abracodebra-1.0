@@ -56,6 +56,8 @@ namespace Abracodabra.UI.Toolkit {
 
   Label hotbarTooltipLabel;
 
+  UIDorisBellyController dorisBellyController; // B3: belly pips above Doris
+
   PlayerHungerSystem playerHungerSystem;
 
   MonoBehaviour dorisHungerSystemRef;
@@ -117,7 +119,14 @@ namespace Abracodabra.UI.Toolkit {
    hotbarController.HandleInput();
   }
 
+  void LateUpdate() {
+   // B3: after the camera has moved this frame
+   dorisBellyController?.Refresh();
+  }
+
   void OnDestroy() {
+   dorisBellyController?.Dispose();
+
    InventoryService.OnInventoryChanged -= HandleInventoryServiceChanged;
    InventoryService.Unregister();
 
@@ -249,6 +258,16 @@ namespace Abracodabra.UI.Toolkit {
    }
 
    TryFindAndSubscribeToDoris();
+
+   // B3: Doris's belly. Pips above her (HUD panel, so they show with the world) and the
+   // footer speaks the same number ("DORIS'S BELLY 5 / 8") instead of raw hunger.
+   var dorisLabel = rootElement.Q<Label>("doris-hunger-label");
+   if (dorisLabel != null) dorisLabel.text = "DORIS'S BELLY";
+   var doris = FindFirstObjectByType<Abracodabra.Ecosystem.DorisController>();
+   if (doris != null && hudPanel != null) {
+    dorisBellyController = new UIDorisBellyController();
+    dorisBellyController.Initialize(hudPanel, doris);
+   }
 
    if (TickManager.Instance != null) {
     TickManager.Instance.OnTickAdvanced += UpdateTickDisplay;
@@ -479,23 +498,19 @@ namespace Abracodabra.UI.Toolkit {
   }
 
   void UpdateDorisHungerDisplay(float currentHunger, float maxHunger) {
-   if (dorisHungerBarFill != null) {
-    float percentage = maxHunger > 0 ? (currentHunger / maxHunger) * 100f : 0f;
-    dorisHungerBarFill.style.width = Length.Percent(percentage);
+   // B3: the footer shows the belly in pips (full = food), the same number as the pips
+   // above Doris. One sage fill; the number carries the state (no red/green hue).
+   var rules = DuskRules.Active;
+   int pips = rules.BellyPipsFor(currentHunger, maxHunger);
 
-    if (percentage >= 80f) {
-     dorisHungerBarFill.style.backgroundColor = new Color(0.9f, 0.25f, 0.25f);
-    }
-    else if (percentage >= 50f) {
-     dorisHungerBarFill.style.backgroundColor = new Color(0.95f, 0.6f, 0.2f);
-    }
-    else {
-     dorisHungerBarFill.style.backgroundColor = new Color(0.4f, 0.75f, 0.4f);
-    }
+   if (dorisHungerBarFill != null) {
+    float percentage = rules.bellyPips > 0 ? pips * 100f / rules.bellyPips : 0f;
+    dorisHungerBarFill.style.width = Length.Percent(percentage);
+    dorisHungerBarFill.style.backgroundColor = new Color(0.55f, 0.68f, 0.50f);
    }
 
    if (dorisHungerText != null) {
-    dorisHungerText.text = $"{Mathf.CeilToInt(currentHunger)}/{Mathf.CeilToInt(maxHunger)}";
+    dorisHungerText.text = pips > 0 ? $"{pips} / {rules.bellyPips}" : $"0 / {rules.bellyPips} · empty";
    }
   }
 

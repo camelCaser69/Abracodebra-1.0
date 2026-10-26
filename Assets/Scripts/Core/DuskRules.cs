@@ -43,6 +43,10 @@ namespace WegoSystem {
         [Tooltip("Mercy cap: a starving Doris eats at most this many plants per Day (0 = never).")]
         [Min(0)] public int maxPlantsEatenPerDay = 1;
 
+        [Tooltip("A starving Doris eats a plant only once her belly is down to this many pips " +
+                 "(the hover says 'at 0 she eats a plant').")]
+        [Min(0)] public int eatsPlantAtBellyPips = 0;
+
         [Header("Supper at dusk")]
         [Tooltip("Seconds each fruit takes to fly to Doris (one at a time).")]
         [Min(0.05f)] public float secondsPerFruit = 0.3f;
