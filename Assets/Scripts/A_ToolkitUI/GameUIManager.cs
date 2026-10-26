@@ -57,6 +57,9 @@ namespace Abracodabra.UI.Toolkit {
   Label hotbarTooltipLabel;
 
   UIDorisBellyController dorisBellyController; // B3: belly pips above Doris
+  UIRunEndOverlayController runEndOverlay;     // B3: won / lost, why, Restart
+  public UIDorisBellyController DorisBelly => dorisBellyController;
+  public UIRunEndOverlayController RunEndOverlay => runEndOverlay;
 
   PlayerHungerSystem playerHungerSystem;
 
@@ -268,6 +271,9 @@ namespace Abracodabra.UI.Toolkit {
     dorisBellyController = new UIDorisBellyController();
     dorisBellyController.Initialize(hudPanel, doris);
    }
+
+   runEndOverlay = new UIRunEndOverlayController();
+   runEndOverlay.Initialize(rootElement);
 
    if (TickManager.Instance != null) {
     TickManager.Instance.OnTickAdvanced += UpdateTickDisplay;
@@ -863,6 +869,8 @@ namespace Abracodabra.UI.Toolkit {
    bool isPlanning = (newState == RunState.Planning);
    seedEditorController.SetInteractable(isPlanning);
 
+   if (newState != RunState.GameOver) runEndOverlay?.Hide();
+
    switch (newState) {
     case RunState.Planning:
      ShowPlanningUI();
@@ -874,6 +882,8 @@ namespace Abracodabra.UI.Toolkit {
 
     case RunState.GameOver:
      ShowHUDUI();
+     // B3: the run is over: say why, offer Restart (same seed) / New seed
+     runEndOverlay?.Show(RunManager.Instance);
      break;
    }
   }

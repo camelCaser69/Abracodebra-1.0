@@ -161,9 +161,10 @@ namespace Abracodabra.Ecosystem
             }
 
             // B3: the mercy cap counts per Day
-            if (RunManager.HasInstance)
+            RunManager run = RunManager.Instance;
+            if (run != null)
             {
-                RunManager.Instance.OnRunStateChanged += HandleRunStateChanged;
+                run.OnRunStateChanged += HandleRunStateChanged;
             }
         }
 
@@ -176,9 +177,11 @@ namespace Abracodabra.Ecosystem
         {
             UnsubscribeFromEvents();
 
-            if (RunManager.HasInstance)
+            // HasInstance stays true while quitting, but Instance is then null.
+            RunManager run = RunManager.HasInstance ? RunManager.Instance : null;
+            if (run != null)
             {
-                RunManager.Instance.OnRunStateChanged -= HandleRunStateChanged;
+                run.OnRunStateChanged -= HandleRunStateChanged;
             }
 
             // Unregister from FeedingSystem
@@ -345,9 +348,10 @@ namespace Abracodabra.Ecosystem
         void UpdateHover()
         {
             bool over = false;
-            if (TileInteractionManager.HasInstance && multiTileEntity != null)
+            TileInteractionManager tiles = TileInteractionManager.HasInstance ? TileInteractionManager.Instance : null;
+            if (tiles != null && multiTileEntity != null)
             {
-                Vector3Int? cell = TileInteractionManager.Instance.CurrentlyHoveredCell;
+                Vector3Int? cell = tiles.CurrentlyHoveredCell;
                 over = cell.HasValue && multiTileEntity.OccupiesPosition(new GridPosition(cell.Value));
             }
 

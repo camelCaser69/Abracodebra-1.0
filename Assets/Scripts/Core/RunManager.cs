@@ -18,6 +18,13 @@ namespace WegoSystem {
         Execution
     }
 
+    // B3: how a run ended. GameOver is the end state for both; this says which end.
+    public enum RunOutcome {
+        InProgress,
+        Lost,
+        Won
+    }
+
     public class RunManager : SingletonMonoBehaviour<RunManager> {
         [Header("Game State")]
         [SerializeField] RunState currentState = RunState.Planning;
@@ -33,21 +40,41 @@ namespace WegoSystem {
         [Header("Determinism (A6)")]
         [Tooltip("If checked, a fresh random seed is generated each run. Uncheck and set 'Run Seed' to replay a specific run.")]
         [SerializeField] bool randomizeSeedOnStart = true;
-        [Tooltip("The seed used for all gameplay randomness this run. Shown in logs; surface it on the game-over screen later.")]
+        [Tooltip("The seed used for all gameplay randomness this run. Shown in logs and on the end screen.")]
         [SerializeField] int runSeed = 0;
+
+        [Header("Run End (B3, read only)")]
+        [SerializeField] RunOutcome outcome = RunOutcome.InProgress;
+        [SerializeField] string endReason = "";
 
         public RunState CurrentState => currentState;
         public GamePhase CurrentPhase => currentPhase;
         public int CurrentRoundNumber => currentRoundNumber;
         public int CurrentPhaseTicks => currentPhaseTicks;
         public int RunSeed => runSeed;
+        public RunOutcome Outcome => outcome;
+        public string EndReason => endReason;
+        public DuskVerdict LastVerdict { get; private set; } = DuskVerdict.NextRound;
 
         public event Action<RunState> OnRunStateChanged;
         public event Action<GamePhase, GamePhase> OnPhaseChanged;
         public event Action<int> OnRoundChanged;
+        public event Action<RunOutcome, string> OnRunEnded;   // B3: (outcome, reason), fired once per run
 
         SupperRunner supperRunner;
         public SupperRunner Supper => supperRunner;
+
+        // B3: the seed the next scene load uses (Restart same seed / New seed). Static, so it survives the reload.
+        static bool hasPendingRunSeed;
+        static int pendingRunSeed;
+
+        #if UNITY_EDITOR
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void ResetStaticData() {
+            hasPendingRunSeed = false;
+            pendingRunSeed = 0;
+        }
+        #endif
 
         protected override void OnAwake() {
             SetState(RunState.Planning, true);
@@ -78,7 +105,12 @@ namespace WegoSystem {
         }
 
         void InitializeRunSeed() {
-            if (randomizeSeedOnStart) {
+            if (hasPendingRunSeed) {
+                // B3: a restart asked for this seed (same seed again, or a new one).
+                runSeed = pendingRunSeed;
+                hasPendingRunSeed = false;
+            }
+            else if (randomizeSeedOnStart) {
                 runSeed = Environment.TickCount;
             }
 
@@ -106,7 +138,7 @@ namespace WegoSystem {
             }
 
             Debug.Log("[RunManager] Player has starved! Triggering Game Over.");
-            SetState(RunState.GameOver);
+            EndRun(RunOutcome.Lost, "You starved.");
         }
 
         void SetState(RunState newState, bool force = false) {
@@ -200,9 +232,44 @@ namespace WegoSystem {
             supperRunner.Run(HandleSupperFinished);
         }
 
+        // B3: the dusk check, after supper (DuskRules.Judge): no living plant, then an empty belly, then the win.
         void HandleSupperFinished(SupperRunner.SupperResult result) {
             if (currentState != RunState.Dusk) return;
-            StartNewRound();
+
+            var rules = DuskRules.Active;
+            int livingPlants = SupperRunner.CountLivingPlants();
+            int bellyPips = result.dorisFound ? result.pipsAfter : rules.bellyPips;
+            DuskVerdict verdict = rules.Judge(livingPlants, bellyPips, currentRoundNumber);
+            LastVerdict = verdict;
+
+            Debug.Log($"[RunManager] Dusk {currentRoundNumber}/{rules.roundsToWin}: living plants {livingPlants}, " +
+                      $"belly {bellyPips}/{rules.bellyPips} -> {verdict}");
+
+            switch (verdict) {
+                case DuskVerdict.NextRound:
+                    StartNewRound();
+                    break;
+                case DuskVerdict.Won:
+                    EndRun(RunOutcome.Won, rules.TextFor(verdict));
+                    break;
+                default:
+                    EndRun(RunOutcome.Lost, rules.TextFor(verdict));
+                    break;
+            }
+        }
+
+        /// <summary>B3: ends the run for good (GameOver is sticky; only a restart leaves it).</summary>
+        void EndRun(RunOutcome runOutcome, string reason) {
+            if (currentState == RunState.GameOver) return;
+
+            outcome = runOutcome;
+            endReason = reason;
+            WaveManager.Instance?.StopCurrentWaveSpawning();
+
+            Debug.Log($"[RunManager] Run {(runOutcome == RunOutcome.Won ? "WON" : "LOST")} at round {currentRoundNumber}: " +
+                      $"\"{reason}\" (seed {runSeed})");
+            SetState(RunState.GameOver);
+            OnRunEnded?.Invoke(outcome, endReason);
         }
 
         void StartNewRound() {
@@ -215,8 +282,31 @@ namespace WegoSystem {
             OnRoundChanged?.Invoke(currentRoundNumber);
         }
 
+        /// <summary>Restart with the same seed (kept for older callers).</summary>
         public void RestartGame() {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            RestartRun(true);
+        }
+
+        /// <summary>
+        /// B3: reloads the scene as a fresh run. sameSeed replays this run's seed, otherwise a new one.
+        /// The persistent singletons (this one included) are torn down first so nothing carries over.
+        /// </summary>
+        public void RestartRun(bool sameSeed) {
+            int nextSeed = sameSeed ? runSeed : NewSeed();
+            pendingRunSeed = nextSeed;
+            hasPendingRunSeed = true;
+
+            Debug.Log($"[RunManager] Restart ({(sameSeed ? "same seed" : "new seed")}): seed {nextSeed}.");
+
+            int sceneIndex = SceneManager.GetActiveScene().buildIndex;
+            SingletonRuntime.TearDownForRestart();
+            SceneManager.LoadScene(sceneIndex);
+        }
+
+        int NewSeed() {
+            int seed = Environment.TickCount;
+            if (seed == runSeed) seed++;
+            return seed;
         }
 
         class PhaseTickHandler : ITickUpdateable {

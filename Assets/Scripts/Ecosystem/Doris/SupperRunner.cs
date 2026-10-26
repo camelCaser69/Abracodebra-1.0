@@ -27,6 +27,7 @@ namespace Abracodabra.Ecosystem {
             public int pipsBefore;
             public int pipsAfter;
             public int livingPlants;
+            public bool dorisFound;
 
             public override string ToString() {
                 return string.Format(CultureInfo.InvariantCulture,
@@ -71,7 +72,8 @@ namespace Abracodabra.Ecosystem {
             DorisHungerSystem hunger = doris != null ? doris.HungerSystem : null;
 
             var result = new SupperResult {
-                round = RunManager.HasInstance ? RunManager.Instance.CurrentRoundNumber : 0
+                round = RunManager.HasInstance ? RunManager.Instance.CurrentRoundNumber : 0,
+                dorisFound = hunger != null
             };
             if (hunger != null) {
                 result.hungerBefore = hunger.CurrentHunger;
