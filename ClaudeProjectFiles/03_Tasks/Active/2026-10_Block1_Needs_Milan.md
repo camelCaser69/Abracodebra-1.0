@@ -2,6 +2,18 @@
 
 One dated bullet per item: what, why, what was done instead. Newest at the bottom. Close an item by striking it through and writing the answer.
 
+## ☀☀ Summary 2 (2026-10-26, daytime unattended run, written by the orchestrator)
+
+1. **Steps done, in order:** P, B4, B5, B6, B7, B9. All passed; the orchestrator checked each report against `git log` / `git status` on disk. **B8 (Shoo) is not built**: the playtest decides. Console: 0 errors after every batch.
+2. **Commits on `block1/doris-by-dusk`** (nothing pushed): P `a91dbf4` (data: 4 Starter Seeds) `494e19a` (scene: startPaused off, one line) `8d1b464` (docs); B4 `c1392dc` `d81ea4f` `e94ba92`; B5 `fad02f1` `f359af2` `0642ac7`; B6 `bd95725` `da45a20` `225de93`; B7 `ac2e7ed` `fe9e9ca`; B9 `a4c5ae0` `277d2a4` `bd3f250` `5e151c7`.
+3. **What you can play now:** 4 seeds; the Day starts unpaused; wave markers (edge, count, time) in the Planning garden view; one bunny group per Day (2/3/3/4/5, no deer), cleared at dusk; bite text ("-1 leaf · bunny"); auto-pauses on the first wave, every plant death and Doris's first plant-eat; phase banner; dusk ledger with Continue; player HUNGER bar hidden; "NEW TEXT" fixed; READS AS sentence under the strand.
+4. **Playtest sheet for tonight:** end of this file, "## Playtest sheet (tonight)" (8 items, Checkpoint A folded into item 7). Open decisions with recommendations: B9 section.
+5. **Check by eye (the 3 that matter):**
+   - **The scene is dirty on disk (read B9 "The uncommitted working tree").** `SampleScene.unity` holds `ExecutionPhaseDriver.currentSpeedIndex: 1`, so the Day runs at **x2** until you press Tab. Fix: set Current Speed Index to 0 in the Inspector, save, commit the scene alone. A subagent's attempt to reset it by script was denied, so it is yours.
+   - **The top banner and the ledger** (banner is opaque, 38 px, covers the top of the world; two START DAY buttons per view; ledger placement): readable and not in the way?
+   - **Auto-pause frequency and the wave numbers:** "every plant death" pauses up to 4 times in a 50 s Day in tests; the bunny counts are unplaytested guesses and may be brutal in rounds 4–5.
+6. `projectmemory.md` was trimmed 44 KB → 32 KB (old entries archived verbatim to `99_Archive/projectmemory_history.md`). `ProjectSettings.asset` (`runInBackground` flip) is also uncommitted; the two `04_Reviews/` files are not from this lane.
+
 ## ☀ Morning summary (2026-10-26, overnight run, written by the orchestrator)
 
 1. **Batches B0, B1, B2, B3 all passed** (B0 Sonnet, B1 Opus, B2 Sonnet, B3 Opus xhigh). The run stopped after B3 as planned: Checkpoint A needs you.
