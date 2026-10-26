@@ -103,3 +103,56 @@ One dated bullet per item: what, why, what was done instead. Newest at the botto
 - **2026-10-26 · FYI: the spec sheet's copy refreshes on hover or click, not on every edit.** It shows the sentence of the seed last displayed there (a click, hover or hover-exit), so right after a drop it can lag by one hover; the copy under the strand is always current. Say if the spec sheet should refresh on each edit too.
 - **2026-10-26 · FYI: decimals are written with a dot** ("1.5 E per tick"), whatever the PC's region setting; the rest of the spec sheet still follows the region (comma).
 - **2026-10-26 · Left uncommitted on purpose:** `SampleScene.unity`, `ProjectSettings.asset` (step P's stale values, unchanged), untracked review files in `04_Reviews/` that this run did not create. `TileMappingsBackup.json` discarded with `git restore`. No scene or asset edits (the label is code-built; the CLI only read gene assets).
+
+
+## B9 (2026-10-26, unattended)
+
+- **2026-10-26 · Done: B9 close-out, docs only (commits `a4c5ae0`, `277d2a4`, `bd3f250`, plus this file and the pack's progress line).** `projectmemory.md` Snapshot rewritten for the state after B0-B7 + P (B8 Shoo not built: the playtest decides), 44 KB to 32 KB; step P, B1, B2, B3 entries, the Measured bullets of B4-B7 and the decision rows dated 2026-10-05 and older were appended verbatim to `99_Archive/projectmemory_history.md` (one-line pointers stay). The Decision log got the keep-list and the run's calls. `Codebase_Map.md` already held `DuskRules`, `SupperRunner`, `DayTally`, the run-end overlay, ledger, phase banner, auto-pause banner, wave markers, belly pips, dev readout, `WaveEntryGeometry` and the `RunState.Dusk` flow; only "Reads as" and the big-file line counts were missing and are patched. `Roadmap.md` section 4 lists everything cut or deferred (20 rows). The Unity console shows 0 errors (read-only check). The Feedback_Log is untouched (yours).
+- **2026-10-26 · Heads-up: projectmemory is 32 KB, not 30.** Getting lower would have meant deleting Built text from B4-B7 and the Code facts, which the batch said to keep. Roadmap row 4.9 sets the cadence (trim at every block close, and past ~35 KB).
+
+### The uncommitted working tree (read before you commit anything)
+
+- `Assets/Scenes/SampleScene.unity` has stale values: `ExecutionPhaseDriver.currentSpeedIndex` is 1 (HEAD 0, so the Day runs at x2 until you press Tab) and `RunManager.currentState/currentPhase` are 1 (HEAD 0; Play still starts in Planning). It also carries harmless 6.3 reserialization noise and the B3 serialized fields. `ProjectSettings/ProjectSettings.asset` has `runInBackground` 0 to 1 (set from CLI play-testing).
+- **How to fix:** open `SampleScene`, select the object with `ExecutionPhaseDriver`, set **Current Speed Index** to 0 in the Inspector (and the `RunManager` object's current state / phase back to 0 if the Inspector shows 1), save the scene; then review the scene diff in GitHub Desktop (only the noise and the B3 fields should remain) and commit the scene on its own as `scene: ...`. `ProjectSettings.asset`: `git restore` it, or keep `runInBackground` on (harmless) and commit it alone. The orchestrator and this batch did not touch either file.
+- `TileMappingsBackup.json` is re-saved by Unity on every Play: discard it with `git restore`. The untracked files in `04_Reviews/` (`2026-10_Block1_B0-B3_Code_Review.md`, `2026-10_Block2_Recon.md`) are not from the code lane.
+
+### Open decisions (de-duplicated from all sections; one line each, with my recommendation)
+
+Already decided and written into the Decision log: 4 starting seeds, Start Paused off, deer dropped, waves retuned, pests cleared at dusk, player HUNGER bar hidden, and the keep-list (drain 0.5/tick, garden-gone check first, wet dirt dries only in the Day, garden view G, hotbar keys active in the Day, hand-feeding only in Planning).
+
+1. **B8 Shoo: build or not?** Recommendation: decide from the playtest. Build it only if item 3 is "yes" (I felt I had to do something with my hands) or items 4 and 5 say the Day is passive; the lever order is shorter Day, denser telegraphed waves, Shoo.
+2. **Wave numbers (bunnies 2/3/3/4/5, 0:05) are unplaytested guesses.** Recommendation: leave until you have lost or won once, then tune `Wave_000-004.asset` (Spawn Count, Interval, Entry Along).
+3. **Auto-pause on every plant death (pack) vs the first only (D6).** Recommendation: keep "every" for this playtest and judge item 4; if it nags, untick `autoPausePlantDeath` in `DuskRules.asset`.
+4. **First-wave pause fires at spawn (pest still off-screen), not when it enters the view.** Recommendation: keep; the banner says "from the east".
+5. **The events number is fruit-dominated.** Recommendation: read F9's breakdown line (bites + kills + scares + lost) for the density test; count fruit per plant-cycle later if the number misleads.
+6. **The ledger always waits for Continue, also at the last dusk (two clicks before the end card).** Recommendation: keep for now; skip it at the last dusk only if it feels like a speed bump.
+7. **Banner and layout taste (38-px opaque banner, two START DAY buttons per view, empty left half of the bottom bar).** Recommendation: decide by eye in the playtest; drop the banner's small START DAY first if you want one.
+8. **A plant eaten by Doris counts as lost in the ledger but not in F9.** Recommendation: leave; unify when the death pipeline is touched.
+9. **Real hover tooltips for new terms (Dusk ledger, Reads as).** Recommendation: Block 2, one reusable hover helper (UI Toolkit tooltips do not show at runtime).
+10. **Zooming between reading a marker and START DAY moves the entry point.** Recommendation: act only if you zoom in Planning and notice; then freeze the entry at START DAY.
+11. **The spec sheet "Reads as" lags one hover behind an edit.** Recommendation: leave (the copy under the strand is always current).
+12. **Second species and `counterHint` (fox, bird, deer definitions; the marker names what beats each pest).** Recommendation: after the playtest, with the B8 / Block 2 pick; one group per Day is the current limit.
+13. **Remove the F9 dev readout?** Recommendation: keep through the playtest, then delete it or hide it behind a dev flag.
+14. **Older, still yours:** merge `upgrade/unity-6.3` and `block1/doris-by-dusk` into `main` and push (the CLI push failed on authentication); decide the Testing Sandbox (keep or drop); zip and delete the `Abracodebra 1.0 - Backup 08.07.2026` folder; turn off the old Cowork "KB doctor" task and the old claude.ai Project; fix Bitbloom's CLAUDE.md section 8.
+15. **Check by eye, never proven by the CLI (all sections):** a real mouse on Continue / START DAY / the hover boxes, WASD by hand, legibility of F9, pips, bite text, ledger, banner and READS AS at your resolution, the supper fruit flight, a live Fear gene.
+
+## Playtest sheet (tonight)
+
+Adapted from pack section 4 to what was built. Fix the scene first (above) or press **Tab** once at the start of the first Day to get x1. Eight items, in play order; Checkpoint A is item 7. Answer in your own words in `02_Design/Feedback_Log.md` (the code lane does not edit that file).
+
+New this time: you plant in Planning; the Day is hands off; Doris eats every fruit at dusk; she must not go to bed hungry, for 5 rounds. You start with 4 seeds.
+
+1. **Do:** Play. Planning opens on the seed editor (banner: "PLANNING · ROUND 1 OF 5"). Press **G** for the garden. Hover Doris and the wave marker at the east edge. **Look for:** belly pips (8, filled vs hollow) with a hover box; a marker with the bunny icon, "x2" and "0:05", and a hover saying who, from where, when, what it eats and whether Fear works. **Answer:** can I say what comes, from where, and what Doris needs tonight? yes / no
+2. **Do:** hoe, plant 3-4 seeds, water, walk with WASD for a while, press **F9**. Press **G**, edit one strand (drag a gene) and read the **READS AS** sentence under it. **Look for:** F9's checksum (plants · cells · energy · fruit) does not move while you walk and edit; the sentence changes as soon as you drop a gene. **Answer:** did anything grow or change that should not have, and did the sentence match what I built? yes / no
+3. **Do:** press START DAY (the banner's button or the big one); hands off; Space once to pause, once to resume, Tab once for speed. Click tiles and press WASD: nothing should happen. **Look for:** the banner "DAY · ROUND 1 OF 5" and its "Now:" line. **Answer:** did I feel I had to do something with my hands? yes / no
+4. **Do:** watch the first wave reach your plants. **Look for:** the auto-pause ("DAY PAUSED", "First wave: 2 bunnies from the east."), Space to resume; "-1 leaf · bunny" at each bite; a pause with a reason when a plant dies. **Answer:** could I tell who ate what without hovering? yes / no
+5. **Do:** watch a defence gene answer a bite (put a poison cloud or thorns on one seed in item 2 if you can). **Look for:** the bunny leaving or dying and "bunny down · (gene name)". **Answer:** did a choice I made in Planning visibly pay off? yes / no
+6. **Do:** at dusk watch supper, then read the dusk ledger and press **Continue**. **Look for:** each fruit flying into Doris and the pips rising; three rows (DORIS, PESTS, PLANTS) that agree with the pips and the footer "DORIS'S BELLY n / 8". **Answer:** did fruit, pips and ledger agree? yes / no
+7. **Do (Checkpoint A):** play on to a win or a loss (up to 5 rounds). **Look for:** the end card and its reason ("The garden is gone." / "Doris went to bed hungry." / "Doris sleeps. You made it through the season."). **Answer:** could I tell why I won or lost, and was it my plan's fault? yes / no. Write one line into `Feedback_Log.md`.
+8. **Do:** Restart (same seed) on the end card and play again (at least Day 1 and 2) with F9 open. **Answer:** another run? yes / maybe / no · Clarity · Agency · Tension · Fun (1-5) · F9's "Events this Day" on Day 2: ___ in ___ s (and the breakdown line).
+
+**If it comes up:** Doris eats a plant (at most once a Day; the ledger names it) · a plant dies (auto-pause with a reason) · hotbar keys and zoom still work in the Day (decided: keep) · a wet tile does not dry while you walk in Planning (decided: keep) · B8 Shoo is not built: did you miss it, and when?
+
+**Density test** (from the pack): passes if item 3 is "no", items 4 and 5 are "yes", Day 2's events are at least 1 per 10-15 s with at most 1 group starting per minute, and item 8 is "yes" or "maybe". Fails: shorter Day, then denser telegraphed waves, then Shoo (B8), then Block 2 picks between Mark & Go and trigger genes.
+
+**Next action (Milan):** fix or accept the dirty scene, play the sheet once, write the Feedback_Log line, then tell the design lane: Shoo yes / no, and the Block 2 pick.
