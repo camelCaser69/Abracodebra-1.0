@@ -24,7 +24,8 @@ namespace WegoSystem {
         [SerializeField] int currentPhaseTicks = 0;
 
         [Header("Player Death")]
-        [Tooltip("If checked, the game will end when the player's hunger reaches max.")]
+        [Tooltip("If checked, the game will end when the player's hunger reaches max. " +
+                 "B3: set from DuskRules.playerStarvationEndsRun at Initialize (off in Block 1, D4).")]
         public bool playerDeathEnabled = true;
 
         [Header("Determinism (A6)")]
@@ -50,6 +51,9 @@ namespace WegoSystem {
         public void Initialize() {
             // A6: seed the deterministic RNG once per run, before any gameplay randomness.
             InitializeRunSeed();
+
+            // B3 (D4): only Doris and the garden end the run, unless DuskRules says otherwise.
+            playerDeathEnabled = DuskRules.Active.playerStarvationEndsRun;
 
             if (TickManager.Instance != null) {
                 TickManager.Instance.RegisterTickUpdateable(new PhaseTickHandler(this));

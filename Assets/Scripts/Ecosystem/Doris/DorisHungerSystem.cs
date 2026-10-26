@@ -35,6 +35,23 @@ namespace Abracodabra.Ecosystem {
         public HungerState CurrentState => currentState;
         public DorisDefinition Definition => definition;
 
+        /// <summary>
+        /// B3: hunger added per Day tick this round. Base = DuskRules.dorisHungerPerTick
+        /// (or DorisDefinition.hungerPerTick when that is 0), times the round ramp.
+        /// </summary>
+        public float CurrentHungerPerTick {
+            get {
+                if (definition == null) return 0f;
+                var rules = DuskRules.Active;
+                float baseRate = rules.dorisHungerPerTick > 0f ? rules.dorisHungerPerTick : definition.hungerPerTick;
+                int round = RunManager.HasInstance ? RunManager.Instance.CurrentRoundNumber : 1;
+                return baseRate * rules.HungerMultiplierForRound(round);
+            }
+        }
+
+        /// <summary>B3: belly pips (full = DuskRules.bellyPips), a view over hunger.</summary>
+        public int BellyPips => DuskRules.Active.BellyPipsFor(currentHunger, MaxHunger);
+
         // Convenience properties
         public bool IsSatisfied => currentState == HungerState.Satisfied;
         public bool IsHungry => currentState == HungerState.Hungry || currentState == HungerState.Starving;
@@ -94,9 +111,9 @@ namespace Abracodabra.Ecosystem {
                 return;
             }
 
-            // Increase hunger each tick
+            // Increase hunger each tick (B3: DuskRules base rate and round ramp)
             float previousHunger = currentHunger;
-            currentHunger += definition.hungerPerTick;
+            currentHunger += CurrentHungerPerTick;
             currentHunger = Mathf.Clamp(currentHunger, 0f, definition.maxHunger);
 
             // Check for state changes

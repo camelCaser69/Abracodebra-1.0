@@ -26,6 +26,8 @@ namespace Abracodabra.Ecosystem
 
         [Header("Starvation Behavior")]
         [SerializeField] private int ticksSinceLastPlantEat = 0;
+        [Tooltip("B3: plants eaten since this Day began (mercy cap in DuskRules).")]
+        [SerializeField] private int plantsEatenToday = 0;
 
         [Header("Debug")]
         [SerializeField] private bool debugLog = false;
@@ -42,6 +44,7 @@ namespace Abracodabra.Ecosystem
         public DorisDefinition Definition => definition;
         public DorisHungerSystem HungerSystem => hungerSystem;
         public MultiTileEntity MultiTileEntity => multiTileEntity;
+        public int PlantsEatenToday => plantsEatenToday;
 
         #region IWorldInteractable Implementation
 
@@ -137,12 +140,23 @@ namespace Abracodabra.Ecosystem
             {
                 FeedingSystem.Instance.RegisterFeedable(this);
             }
+
+            // B3: the mercy cap counts per Day
+            if (RunManager.HasInstance)
+            {
+                RunManager.Instance.OnRunStateChanged += HandleRunStateChanged;
+            }
         }
 
         void OnDestroy()
         {
             UnsubscribeFromEvents();
-            
+
+            if (RunManager.HasInstance)
+            {
+                RunManager.Instance.OnRunStateChanged -= HandleRunStateChanged;
+            }
+
             // Unregister from FeedingSystem
             if (FeedingSystem.Instance != null)
             {
@@ -378,9 +392,21 @@ namespace Abracodabra.Ecosystem
             ticksSinceLastPlantEat = 0;
         }
 
+        void HandleRunStateChanged(RunState newState)
+        {
+            // B3: a new Day resets the mercy cap
+            if (newState == RunState.GrowthAndThreat)
+            {
+                plantsEatenToday = 0;
+            }
+        }
+
         void HandleStarvationTick()
         {
             if (definition == null) return;
+
+            // B3 mercy cap: at most DuskRules.maxPlantsEatenPerDay plants a Day
+            if (plantsEatenToday >= DuskRules.Active.maxPlantsEatenPerDay) return;
 
             ticksSinceLastPlantEat++;
 
@@ -445,6 +471,7 @@ namespace Abracodabra.Ecosystem
                 hungerSystem.OnAtePlant();
             }
 
+            plantsEatenToday++;
             OnDorisAtePlant?.Invoke(plant);
 
             UnityEngine.Object.Destroy(plant.gameObject);

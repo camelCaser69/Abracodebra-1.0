@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b06f7a48acbec1f409d8cab8de6c3313, type: 3}
+  m_Name: DuskRules
+  m_EditorClassIdentifier: 
+  roundsToWin: 5
+  waves: []
+  bellyPips: 8
+  dorisHungerPerTick: 0.5
+  hungerRampPerRound: 0.15
+  maxPlantsEatenPerDay: 1
+  secondsPerFruit: 0.3
+  fruitArcHeight: 1.2
+  fruitFlightScale: 3
+  holdAfterSupper: 0.8
+  playerStarvationEndsRun: 0
+  gardenGoneText: The garden is gone.
+  dorisHungryText: Doris went to bed hungry.
+  winText: Doris sleeps. You made it through the season.
