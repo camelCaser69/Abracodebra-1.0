@@ -139,6 +139,11 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
     {
         if (!enabled || definition == null) return;
 
+        // B1 (Planning-tick invariant): fauna acts only during Growth & Threat. The scene keeps
+        // last Day's animals into Planning (WaveManager.deletePreviousWaveAnimals is off), so
+        // without this gate a pest would keep eating plants on every Planning action tick.
+        if (RunManager.HasInstance && RunManager.Instance.CurrentState != RunState.GrowthAndThreat) return;
+
         if (!isDying && needs != null && needs.CurrentHealth <= 0)
         {
             StartDying();

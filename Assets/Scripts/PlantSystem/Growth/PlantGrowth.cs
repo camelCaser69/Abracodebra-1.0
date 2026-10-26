@@ -218,6 +218,14 @@ namespace Abracodabra.Genes
 
         public void OnTickUpdate(int currentTick)
         {
+            // B1 (Planning-tick invariant): plants simulate only during Growth & Threat.
+            // Planning ticks advance the player's action economy only: no growth, energy,
+            // regrowth, withering or gene execution (Commit & Watch §4.1).
+            if (RunManager.HasInstance && RunManager.Instance.CurrentState != RunState.GrowthAndThreat)
+            {
+                return;
+            }
+
             // Regrowth runs BEFORE withering early-return so a withering plant can save itself
             if (leafRegrowthRate > 0 && destroyedLeafPositions.Count > 0)
             {

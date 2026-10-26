@@ -95,6 +95,13 @@ namespace WegoSystem
 
         public void OnTickUpdate(int currentTick)
         {
+            // B1 (Planning-tick invariant): timed tiles (wet dirt drying out) only count down
+            // during Growth & Threat, so walking in Planning does not undo watering.
+            if (RunManager.HasInstance && RunManager.Instance.CurrentState != RunState.GrowthAndThreat)
+            {
+                return;
+            }
+
             UpdateReversionTicks();
         }
 

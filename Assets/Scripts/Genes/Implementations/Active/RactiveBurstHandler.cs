@@ -71,6 +71,12 @@ namespace Abracodabra.Genes.Implementations
         /// </summary>
         public void OnTickUpdate(int currentTick)
         {
+            // B1 (Planning-tick invariant): gene timers run only during Growth & Threat.
+            if (RunManager.HasInstance && RunManager.Instance.CurrentState != RunState.GrowthAndThreat)
+            {
+                return;
+            }
+
             if (cooldownRemaining > 0)
             {
                 cooldownRemaining--;
