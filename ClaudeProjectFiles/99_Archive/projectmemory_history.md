@@ -72,3 +72,39 @@ Active design threads:
 - **Gene architecture**: `GeneBase` (ScriptableObject) → `ActiveGene` / `ModifierGene` / `PayloadGene`; `SeedTemplate` = default config; `PlantGeneRuntimeState` = player's edited sequence. Key separation: genetic traits (define behaviors) vs. physical items (consumable objects)
 - **Output rules**: Full copy-pasteable methods/scripts; no placeholders like `// rest of code`; no versioned filenames (use original names); hook things up in code over Inspector linking to minimize manual work
 - **Design philosophy**: Long-term architectural solutions over quick fixes; modular service-oriented design; ScriptableObjects for designer-friendly configuration
+
+
+---
+
+## Moved from projectmemory.md on 2026-10-26 (Block 1 B3 trim, verbatim)
+
+**2026-10-05 — modernization pack, Phases D–E: Unity CLI and the 6.3 upgrade** (results: `04_Reviews/2026-10_Baseline_6.0/`, `04_Reviews/2026-10_Unity63_Upgrade.md`)
+- Phase D: `com.unity.pipeline` 0.8.0-exp.1 installed; 6.0 baseline recorded (0 errors, 1 known warning, camera + screen captures); CLI gotchas in CLAUDE.md §7.
+- Phase E: tag `pre-unity-6.3` on main, branch `upgrade/unity-6.3`, project on 6000.3.24f1. The reimport gave 5 errors and 13 warnings, all fixed in one commit per group: `[RuntimeInitializeOnLoad]` in the generic `SingletonMonoBehaviour<T>` (flag moved to `SingletonQuitState`), the two custom 2D sprite shaders vs URP 17.3 (duplicate `LightingUtility.hlsl` include and `SHAPE_LIGHT(n)`, unguarded debug macro), 12 unsupported USS declarations. Unity itself bumped the packages to Bitbloom's versions (URP 17.3.0, Input System 1.20.0, Test Framework 1.6.0). After: 0 errors, same 1 warning; world capture within 4/255 of the baseline.
+- Smoke test: Planning UI, gene editing, Space/Tab, waves/pests, water and tiles fine. **Plant growth and Doris feeding were not confirmed** (Roadmap #9); no console error, not shown to be a regression. Side finding: the plant action fires twice. The 6.3 "Input Manager is deprecated" warning stays until the 36 legacy `Input.*` sites move to the Input System.
+
+**2026-10-05 — modernization pack, Phases A–C** (`03_Tasks/Done/2026-10_Modernization.md`, results in its §7)
+- Phase A: baseline commit `3a0abe0`, tag `pre-modernization`; `charming-elgamal` was already merged into main and its local label deleted.
+- Phase B: `.gitignore` / `.gitattributes` aligned with Bitbloom; IDE config, `UIElementsSchema/` and the root code extracts untracked/deleted; extractor and Cline rules archived; 492 unused TMP font files (1.14 GB) moved to `D:\Unity Projects\AbraCodebra\_Vault\Abracodebra_TMP_fonts\` (`Assets/TextMesh Pro` 1.2 GB → 59 MB); `visualscripting`, `multiplayer.center`, `collab-proxy` removed from `manifest.json`.
+- Phase C: KB consolidated (fixed names for living docs, dated names for point-in-time docs, WeGo reworks archived, `Roadmap.md`, this file rewritten, `Feedback_Log.md`, new CLAUDE.md, `.claude/settings.json`).
+- Findings: `SEGUIEMJ.TTF` (Segoe UI Emoji) is used by `StatusEffect_Icon.prefab` and is not redistributable → Roadmap #7. `Assets/Editor/TileMappingsBackup/` is referenced by `TileInteractionManager.cs`: keep.
+
+**2026-07-20 — final Fable 5 session** (design only, nothing implemented)
+- The Ledger (D1–D10), the Phase Identity refinement (Mark & Go; B rebuilt as B-rev), the project audit (`04_Reviews/2026-07_Project_Audit_Gaps_And_Opportunities.md`: H1 unloseable, H2 no victory arc, H3 no save, H4 first 10 minutes; C3 golden-run harness before F1), and the gene catalog expansion (28 proposed genes; the demo-eight: Alluring + Camouflage, Catalyst, Trigger Dawn/Dusk, Sap Well, Fertilizer, Lifesteal, Leap, Last Stand) with its experimental annex.
+
+**2026-07-05 to 07-08 — A-category pack applied, research** 
+- A1–A6 applied on 2026-07-05 (auto-tick driver, plant death pipeline, timer-honest round end, idempotent `BaseEnergyPerLeaf`, init without `Invoke` delays, run seed). Editor wiring 2026-07-06; Milan confirmed auto-tick, Space, Tab and the run seed in play. The rest of Part 4 was never run (Roadmap #6).
+- Concepts: gameplay engagement research (07-05; nine shortcomings), Commit & Watch loop design (07-06, Rev 2), UI systems research (07-08; input layer is the most fragile surface), minigames re-evaluation (07-08; supersedes the §7 ranking of the engagement research).
+
+**2026-10-26 — Block 1 B0 done: growth and feeding verified on 6.3, two bugs fixed** (unattended run, branch `block1/doris-by-dusk`, commits `2585c97`, `4fbf5b5`; Unity CLI + scripted `eval` to drive Play mode)
+- **Plants grow on 6.3.** Planted at (20,15) (hoe, then `ExecutePlayerAction(PlantSeed)`), START DAY, unpaused: `Initializing` → `Growing` after 0.5 s → **`Mature` at tick ~9–13 (≈ 5–7 s at 2 ticks/s, 1×)**, energy 6 → 26–34, 23–31 sprite cells, first fruit by tick ~17, 3–4 by tick ~26. An unprotected plant is eaten by the first wave and dies by tick ~34–49 (Day = 100 ticks). No regression comparison against `pre-unity-6.3` was needed.
+- **Why the 6.3 smoke test saw no growth:** `ExecutionPhaseDriver.startPaused = 1` in `SampleScene` (also on `pre-unity-6.3`): the Day begins paused and waits for Space. Not fixed (scene change; Needs Milan).
+- **Harvest → feed works:** `Harvest` yields Nutri-Berries into the inventory; `FeedingSystem.StartFeedingInteraction(doris)` shows `FoodSelectionPopup` with them; feeding one (nutrition 10) moved Doris's hunger 100 → 90 (scripted selection, not a hand click). `FeedingSystem.restrictToGrowthPhase` still blocks right-click feeding in Planning.
+- **Double plant fixed (Roadmap #9):** while the planting timing circle ran, the click that hits it was also read by `PlayerTileInteractor`; its second `PlantSeed` call saw the minigame active, failed to start one and fell through to `ExecutePlantSeedImmediate` (planted at once; the deferred plant then hit "already occupied" and the seed callback ran twice). Now `PlayerTileInteractor` ignores clicks while `MinigameManager.IsMinigameActive` and `PlayerActionManager` returns `false` instead of falling through.
+- **Dead plants were never destroyed (found in B0):** `PlantWorldUI` (a component on the plant's own GameObject) called `gameObject.SetActive(false)` on `Dead`, which stopped `PlantGrowth.DeathSequence`; the corpse stayed in `PlantGrowth.AllActivePlants` (state `Dead`) and held its tile. Now it hides only the energy bar. Later batches (B3 "no living plant") should still filter on `CurrentState != Dead`.
+- **Planting-in-Planning side finding for B1:** `TickManager.RequestActionTicks(24)` in Planning grew a fresh plant to Mature with 2 fruits: the Planning-tick invariant is confirmed unenforced.
+- Open (Needs Milan): the Day starts paused; real-mouse planting/feeding unchecked by hand; `Animal_Deer.prefab` has no `AnimalDefinition` (3 console errors on a deer spawn, for B4). Captures: `04_Reviews/2026-10_Block1_Captures/`.
+
+**2026-10-26 — design re-entry: Restart Direction accepted, Block 1 "Doris by Dusk" packed** (design lane; no code changed)
+- `02_Design/Restart_Direction_2026-10-05.md` (written 10-05, accepted "recs" 10-26): Bitbloom's playtests support Commit & Watch, fixtures and the hectic-feel guards; argue against the 15–20 s decision metric, Mark & Go first and ripeness as D8; the plan lacked a goal and a loss.
+- Task pack `03_Tasks/Active/2026-10_Block1_Doris_By_Dusk.md` (B0–B9, cut list, playtest sheet). Bitbloom rules copied into `Feedback_Log.md` (19–27). Ledger D1/D5/D8 and Phase Identity §2.4 carry "revised 2026-10-26" lines. Bitbloom has since become a spider/cave game (no convergence with Abracodabra).
