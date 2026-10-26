@@ -115,7 +115,8 @@ namespace WegoSystem
 
             HandleTileHover();
 
-            if (RunManager.Instance?.CurrentState == RunState.GrowthAndThreat)
+            // B2: refilling is a tile click, so it moves into Planning with the other clicks.
+            if (RunManager.Instance?.CurrentState == RunState.Planning)
             {
                 CheckAndRefillTool();
             }

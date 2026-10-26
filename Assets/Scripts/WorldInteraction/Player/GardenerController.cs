@@ -108,7 +108,8 @@ namespace WegoSystem
             if (FoodSelectionPopup.IsBlockingInput)
                 return;
 
-            if (RunManager.Instance?.CurrentState == RunState.GrowthAndThreat)
+            // B2: WASD only in Planning (frozen time, steps cost action ticks); in the Day she stands still.
+            if (RunManager.Instance?.CurrentState == RunState.Planning)
             {
                 HandlePlayerInput();
             }

@@ -30,7 +30,8 @@ public sealed class PlayerTileInteractor : MonoBehaviour {
 
     void Update()
     {
-        if (RunManager.Instance?.CurrentState != RunState.GrowthAndThreat)
+        // B2: world clicks belong to Planning (time is frozen); the Day is hands off.
+        if (RunManager.Instance?.CurrentState != RunState.Planning)
             return;
 
         // Block click detection while feeding popup is open
