@@ -180,6 +180,6 @@ New this time: you plant in Planning; the Day is hands off; Doris eats every fru
 
 ---
 
-**Progress:** B0 done 2026-10-26 (unattended; see projectmemory). B1 done 2026-10-26 (unattended; invariant enforced, F9 readout; see projectmemory). **Next: B2.**
+**Progress:** B0 done 2026-10-26 (unattended; see projectmemory). B1 done 2026-10-26 (unattended; invariant enforced, F9 readout; see projectmemory). B2 done 2026-10-26 (unattended; planting, walking and tool refill in Planning, Day hands off; see projectmemory). **Next: B3.**
 
 **Next action (original):** Milan does §0 (commit, merge, push, branch), then pastes into a fresh Claude Code session in the repo: *"Sonnet · high · Est. 45–60 min · Est. usage: low — Read CLAUDE.md, projectmemory, then `03_Tasks/Active/2026-10_Block1_Doris_By_Dusk.md` §1 and batch B0 only. Do B0, commit per step, update projectmemory, stop."*
