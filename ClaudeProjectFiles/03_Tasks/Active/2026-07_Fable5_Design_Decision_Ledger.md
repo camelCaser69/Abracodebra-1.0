@@ -35,6 +35,7 @@ least once per 15–20 s of Day phase?*
 - **Anti-thrash rule:** run the A/B toggle in the same build, same seed (`RunSeed`),
   ≥2 runs per mode before judging. One bad run is noise.
   **Revised 2026-07-20 (Phase Identity §4):** the experiment is sequential (A first, B-rev only if A fails), not a same-build toggle.
+  **Revised 2026-10-26 (Restart_Direction §2, accepted):** the density test is now ≥ 1 readable, attributable event at your plants per ~10–15 s of Day, ≤ 1 threat group starting per minute, ≥ 3 real choices per Planning. The first build is Block 1 "Doris by Dusk", not §2.4.
 
 ## D2 · Automation: Fixtures vs embodied gardener ✅
 
@@ -63,6 +64,7 @@ size — per-tile costs punish exactly the expansion the farming fantasy rewards
 A per-tile only if playtests show degenerate verb spam across huge gardens (the failure
 mode A exists to prevent). If A is ever adopted, cap displayed cost math at the tile
 group level, never per-tile mid-drag.
+**Revised 2026-10-26:** no budget at all in Block 1 (a third currency beside energy and food); Planning verbs are free. This default stands for later.
 
 ## D6 · Auto-pause defaults ✅
 
@@ -87,6 +89,7 @@ to a 4th tier post-demo without redrawing anything. Unblocks the pixel-art threa
 - **B wins D1 → Pruning Snip instead** (care verb suits embodied play; Decayed-leaf
   state; graduates to SelfPruning gene). Ripeness depends on the Commit & Watch
   attention economy and mostly evaporates under B.
+- **Reopened 2026-10-26 (Restart_Direction §2):** ripeness windows vs trigger genes (On Bitten, At Dusk), decided after Block 1's playtest.
 - Either way: **one** new system. The substitution board S1–S12 governs everything else;
   cuts already confirmed (editor Splice minigame, scent-trail scouting) stay cut.
 

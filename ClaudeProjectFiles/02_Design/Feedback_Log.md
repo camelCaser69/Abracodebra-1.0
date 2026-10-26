@@ -35,11 +35,21 @@ What Milan liked, disliked and asked for, in his words where possible, so genera
 17. **Markdown, never .docx; moss-and-sage greens and grays over orange, brown and amber** (same digest §2, 2026-07). Explainers: explain, don't sell; first person, his voice.
 18. **Iterative deepening in design talks** (same digest, 2026-07): repeated adversarial passes ("go one more iteration, find the remaining holes"), options weighted and scored, his own ideas may be rejected when argued. His design law: *maximum combinations and strategies from minimum complications.*
 
+19. **Agency needs options, not just information** (Bitbloom rule 12, 2026-09-26). Knowing what's coming is worthless without a lever to answer it.
+20. **Every loss must cost something he cares about** (Bitbloom rule 13, 2026-09-26), and **even the first round needs a stake** (rule 33, 2026-09-27). Toys without a goal or a loss were judged "AFK clicker" whatever their mechanics (Bitbloom log, 2026-10-05).
+21. **Telegraph arrivals on the map itself, before the round** (Bitbloom rule 26 and its ‼️ note, 2026-09-27), and **every danger shows a way past it** (Bitbloom rule 46, 2026-10-25): its tell, its blind spot, one thing in reach that beats it.
+22. **Pacing: not slow, then too fast** (Bitbloom rule 35, 2026-09-27). Tuning that worked (Trap_v2, 2026-10-05): one forced edit every 60–90 s, never two threats starting in one minute, few creatures in minute 1.
+23. **The bite-then-burst moment is the best moment** (Bitbloom rule 40, 2026-09-30): a creature commits at the plant and the defence answers it there. Reactive triggers ("on bitten") beat timers (Bitbloom vein-bus toy, 2026-10-05).
+24. **The verb before the grammar** (Bitbloom design lane, 2026-10-05, toy 5): first contact is one action understood in 5 seconds; programming arrives as a way to change it.
+25. **The Expedition's UI was the clearest** (Bitbloom, Milan, 2026-10-05): worded chips, a "reads as" sentence under the strand, a screen-space card, edits while paused. Never pictogram strings drawn in the world.
+26. **Chores should be automatic from the start** (Bitbloom, the Hollow toy, 2026-10-05): "produce should reach Doris automatically… not carried". The manual tier of "manual → automated" must be a decision, never a chore.
+27. **Density first** (Bitbloom rule 45, 2026-10-25): a small player in a big samey space reads as empty; keep the playable area tight and full. **Test panels never cover the game** (rule 47): dev readouts dock outside the play area, at a fixed size.
+
 ## Open shortcomings (design issues that came out of reviews)
 
-- [ ] ⚠️ **Day under-stimulation** is A's named risk #1: needs ≥ 1 meaningful decision or reaction per 15–20 s of Day (Ledger D1, Phase Identity §2.3).
+- [ ] ⚠️ **Day under-stimulation** is A's named risk #1. Test revised 2026-10-26: ≥ 1 readable, attributable event at your plants per ~10–15 s of Day, ≤ 1 threat group starting per minute, ≥ 3 real choices per Planning (Block 1 pack §4).
 - [ ] ⚠️ **Perfect ≡ Good** is still the live minigame reward path (Ledger warning 4).
-- [ ] ⚠️ **The game cannot be lost** and has no victory arc (audit H1, H2).
+- [ ] ⚠️ **The game cannot be lost** and has no victory arc (audit H1, H2). → Block 1 B3 (Doris by Dusk).
 - [ ] ⚠️ **The first ten minutes are undesigned** (audit H4).
 
 ## Log

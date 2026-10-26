@@ -1,3 +1,5 @@
+**§2.4 (the first build) superseded 2026-10-26 by** `03_Tasks/Active/2026-10_Block1_Doris_By_Dusk.md` (see `02_Design/Restart_Direction_2026-10-05.md`). Mark & Go is deferred, not cut.
+
 # Phase Identity — Final Refinement of A & B (2026-07-20)
 
 **What this is.** Final Fable 5 pass on the §4.3 decision before the experiment build.

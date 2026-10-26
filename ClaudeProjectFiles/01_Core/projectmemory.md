@@ -21,16 +21,21 @@ Older history is in `99_Archive/projectmemory_history.md` (verbatim copy of the 
   - `02_Design/Gene_Systems_Deep_Dive.md` (v6, 2025): the gene system and the strand model;
   - `03_Tasks/Active/2026-07_Fable5_Design_Decision_Ledger.md`: decisions D1–D10 (summarised in the Decision log). **Revised by** `02_Design/Concepts/Phase_Identity_Final_Refinement_2026-07-20.md`: hand-piloted avatar control is out; build A (Commit & Watch, with Mark & Go) first and B-rev (Tick Ledger) only if A fails the density test. That replaces the Ledger's "same-build A/B toggle";
   - `02_Design/Concepts/Commit_And_Watch_Loop_Design_2026-07-06.md` (Rev 2): the detailed spec for A's systems (fixtures, timing asymmetry, four beats, budget);
+  - **`02_Design/Restart_Direction_2026-10-05.md`** (accepted 2026-10-26): what Bitbloom's playtests mean for Abracodabra; revises Phase Identity §2.4 (first build), Ledger D1's density test, D5 (no budget yet) and D8 (reopened);
   - taste: `02_Design/Feedback_Log.md`.
   - Concepts (not decided): gameplay engagement, UI systems, minigames, gene catalog + annex (all in `02_Design/Concepts/`, dated).
-- **Tasks:** `03_Tasks/Roadmap.md` (the candidates, in order); `03_Tasks/Active/`: the Ledger, `2026-07_Pack_Implementation_Guides.md` (F1–F4 guides, all unapplied), `2026-07_Testing_Sandbox.md` (undecided).
+- **Tasks:** `03_Tasks/Roadmap.md` (the candidates, in order); `03_Tasks/Active/`: **`2026-10_Block1_Doris_By_Dusk.md` (the current block, B0–B9, not started)**, the Ledger, `2026-07_Pack_Implementation_Guides.md` (F1–F4 guides, all unapplied), `2026-07_Testing_Sandbox.md` (undecided).
 - **Tooling state:** Claude Code in the terminal is the code lane; the Unity CLI hookup is done (2026-10-05, `com.unity.pipeline` 0.8.0-exp.1; 6.0 baseline in `04_Reviews/2026-10_Baseline_6.0/`). The extractor, `06_Index` and the Cline rules are retired (archived/deleted). No asmdefs of our own and no tests.
 - **Lanes:** design in Cowork or chat (markdown into `ClaudeProjectFiles/`), code in Claude Code. Usage policy: CLAUDE.md §8.
 - **Other projects:** Bitbloom (sibling, `D:\Unity Projects\AbraCodebra\Bitbloom\Bitbloom 0.1a\Bitbloom`, same workflow; never edit it from here); Fistful of Mercs (a tabletop prototype in a separate folder with its own KB; state as of 2026-07-11 in the archived digest).
 - **Open for Milan:** (1) merge `upgrade/unity-6.3` into `main` in GitHub Desktop and push (main and the tags were not on GitHub when last checked; the CLI push failed with an authentication error); (2) the 6.3 smoke test left **plant growth and Doris feeding unconfirmed** (Roadmap #9: replay it with planting done in Planning); (3) decide the Testing Sandbox (keep or drop); (4) the sibling backup folder `Abracodebra 1.0 - Backup 08.07.2026`: zip to cold storage, delete; (5) turn off the old Cowork "KB doctor" task and stop using the old claude.ai Project; (6) fix Bitbloom's CLAUDE.md §8 ("Pro plan") in a Bitbloom session.
-- **Next action:** the merge and push above, then Roadmap #9 (verify plant growth and Doris feeding in play, 5 min). After that, Block 1 from `03_Tasks/Roadmap.md` (asmdef split + golden-run harness, then the A proof of concept).
+- **Next action:** the merge and push above (pack §0), then Block 1 batch B0 in Claude Code (`03_Tasks/Active/2026-10_Block1_Doris_By_Dusk.md`; B0 includes Roadmap #9).
 
 ## Recent entries
+
+**2026-10-26 — design re-entry: Restart Direction accepted, Block 1 "Doris by Dusk" packed** (design lane; no code changed)
+- `02_Design/Restart_Direction_2026-10-05.md` (written 10-05, accepted "recs" 10-26): Bitbloom's playtests support Commit & Watch, fixtures and the hectic-feel guards; argue against the 15–20 s decision metric, Mark & Go first and ripeness as D8; the plan lacked a goal and a loss.
+- Task pack `03_Tasks/Active/2026-10_Block1_Doris_By_Dusk.md` (B0–B9, cut list, playtest sheet). Bitbloom rules copied into `Feedback_Log.md` (19–27). Ledger D1/D5/D8 and Phase Identity §2.4 carry "revised 2026-10-26" lines. Bitbloom has since become a spider/cave game (no convergence with Abracodabra).
 
 **2026-10-05 — modernization pack, Phases D–E: Unity CLI and the 6.3 upgrade** (results: `04_Reviews/2026-10_Baseline_6.0/`, `04_Reviews/2026-10_Unity63_Upgrade.md`)
 - Phase D: `com.unity.pipeline` 0.8.0-exp.1 installed; 6.0 baseline recorded (0 errors, 1 known warning, camera + screen captures); CLI gotchas in CLAUDE.md §7.
@@ -54,6 +59,11 @@ Older history is in `99_Archive/projectmemory_history.md` (verbatim copy of the 
 
 | Date | Decision | Where |
 | --- | --- | --- |
+| 2026-10-26 | **Block 1 = "Doris by Dusk"** (stakes-first Commit & Watch): invariant, planting in Planning, hands-off Day, Doris's belly + supper at dusk, win (5 rounds) / lose, waves on the map, readable bites, dusk ledger. Replaces Phase Identity §2.4 as the first build. Milan: "recs" (Q1–Q9). | `03_Tasks/Active/2026-10_Block1_Doris_By_Dusk.md`; `02_Design/Restart_Direction_2026-10-05.md` |
+| 2026-10-26 | **D1's density test replaced:** Day = ≥ 1 readable, attributable event at your plants per ~10–15 s and ≤ 1 threat group starting per minute; Planning = ≥ 3 real choices with something to choose against; plus "another run?". (Bitbloom: one forced edit per 60–90 s worked; watch-only was the most fun build.) | Restart_Direction §2; pack §4 |
+| 2026-10-26 | **Mark & Go deferred** to a Block 2 candidate (built only if Block 1's playtest asks for a Day lever). **D8 reopened:** ripeness windows vs trigger genes (On Bitten, At Dusk), decided after Block 1. The timing-asymmetry pillar is parked with ripeness. | Restart_Direction §2, §3.1 |
+| 2026-10-26 | **No tick budget in Block 1** (D5's verbs-only default stays for later). **Food reaches Doris automatically at dusk** (supper); no carrying, no Day feeding. Lose = Doris at 0 after supper or no living plant; win = survive round 5. Player starvation off (D4). | Pack §1 |
+| 2026-10-26 | Shoo (one Day click, 10-s cooldown) is Block 1's last, cuttable batch. **asmdef split + golden-run harness move to Block 2** (still before F1). | Pack §2–3; Roadmap #1 |
 | 2026-10-05 | Abracodabra stays a live project, developed alongside Bitbloom; modernized to the Bitbloom workflow (this pack). | `03_Tasks/Done/2026-10_Modernization.md` |
 | 2026-10-05 | **Unity upgraded to 6000.3.24f1** (merged from `upgrade/unity-6.3`; tag `pre-unity-6.3` = the 6.0 state). Accepted by Milan with plant growth and Doris feeding still to verify (Roadmap #9). `com.unity.pipeline` stays at 0.8.0-exp.1 (Bitbloom 0.7.0). | `04_Reviews/2026-10_Unity63_Upgrade.md` |
 | 2026-10-05 | Tooling: Claude Code in the terminal + Unity CLI (`com.unity.pipeline`) replace the extractor, `06_Index` and any MCP bridge. Upgrade to Unity 6000.3.24f1 after the CLI hookup (Phase E). | Pack §5, §6 |
