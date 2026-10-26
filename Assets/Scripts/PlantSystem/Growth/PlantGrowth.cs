@@ -199,6 +199,12 @@ namespace Abracodabra.Genes
             preWitheringColors = null;
             _growthStep = 0;
 
+            // B6: a plant planted in Planning has no tick yet; without this its label showed the prefab's "New Text".
+            if (VisualManager != null)
+            {
+                VisualManager.UpdateUI();
+            }
+
             StartCoroutine(DelayedGrowthStart());
 
             if (TickManager.Instance != null)
