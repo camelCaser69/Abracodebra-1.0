@@ -55,7 +55,7 @@ namespace WegoSystem {
         [Min(0f)] public float fruitArcHeight = 1.2f;
 
         [Tooltip("A flying fruit is drawn this many times its size on the plant, so it can be followed.")]
-        [Min(1f)] public float fruitFlightScale = 3f;
+        [Min(1f)] public float fruitFlightScale = 5f;
 
         [Tooltip("Seconds to hold after the last fruit (and after an empty supper) before the dusk verdict.")]
         [Min(0f)] public float holdAfterSupper = 0.8f;

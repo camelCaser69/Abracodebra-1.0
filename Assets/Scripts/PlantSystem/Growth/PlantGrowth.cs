@@ -828,7 +828,9 @@ namespace Abracodabra.Genes
             }
         }
 
-        public List<HarvestedItem> HarvestAllFruits()
+        /// <param name="harvestedFruitObjects">B3, optional: receives the fruit GameObject behind each returned
+        /// item (same index). They are destroyed at the end of this frame; supper copies their look first.</param>
+        public List<HarvestedItem> HarvestAllFruits(List<GameObject> harvestedFruitObjects = null)
         {
             var harvestedItems = new List<HarvestedItem>();
             if (CellManager == null) return harvestedItems;
@@ -858,6 +860,7 @@ namespace Abracodabra.Genes
                         fruitComponent.DynamicProperties,
                         fruitComponent.PayloadGeneInstances
                     ));
+                    harvestedFruitObjects?.Add(fruitGO);
                 }
                 Destroy(fruitGO);
             }

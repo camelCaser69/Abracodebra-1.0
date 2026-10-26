@@ -200,6 +200,8 @@ namespace Abracodabra.UI.Toolkit {
       ? (phaseDriver.IsPaused ? "paused" : string.Format(CultureInfo.InvariantCulture, "×{0:0.#}", phaseDriver.CurrentSpeedMultiplier))
       : "";
      return $"DAY · round {RunManager.Instance.CurrentRoundNumber} · {speed}";
+    case RunState.Dusk:
+     return $"DUSK · round {RunManager.Instance.CurrentRoundNumber} · supper";
     case RunState.GameOver:
      return "GAME OVER";
     default:

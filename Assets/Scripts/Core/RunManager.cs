@@ -3,12 +3,14 @@ using System;
 using UnityEngine;
 using UnityEngine.SceneManagement; // Required for restarting the scene
 using Abracodabra.Genes.Services;  // A6: deterministic gameplay RNG
+using Abracodabra.Ecosystem;       // B3: supper at dusk
 
 namespace WegoSystem {
     public enum RunState {
         Planning,
         GrowthAndThreat,
-        GameOver
+        GameOver,
+        Dusk            // B3: the Day is over, ticks are stopped, supper runs, then the dusk check
     }
 
     public enum GamePhase {
@@ -44,6 +46,9 @@ namespace WegoSystem {
         public event Action<GamePhase, GamePhase> OnPhaseChanged;
         public event Action<int> OnRoundChanged;
 
+        SupperRunner supperRunner;
+        public SupperRunner Supper => supperRunner;
+
         protected override void OnAwake() {
             SetState(RunState.Planning, true);
         }
@@ -54,6 +59,7 @@ namespace WegoSystem {
 
             // B3 (D4): only Doris and the garden end the run, unless DuskRules says otherwise.
             playerDeathEnabled = DuskRules.Active.playerStarvationEndsRun;
+            EnsureSupperRunner();
 
             if (TickManager.Instance != null) {
                 TickManager.Instance.RegisterTickUpdateable(new PhaseTickHandler(this));
@@ -123,6 +129,10 @@ namespace WegoSystem {
 
                 case RunState.GameOver:
                     break;
+
+                case RunState.Dusk:
+                    // Phase stays Execution; nothing ticks (every Day system is gated on GrowthAndThreat).
+                    break;
             }
 
             OnRunStateChanged?.Invoke(currentState);
@@ -154,16 +164,45 @@ namespace WegoSystem {
         }
 
         public void StartNewPlanningPhase() {
+            // B3: once the run is over, only a restart starts another round.
+            if (currentState == RunState.GameOver) {
+                Debug.Log("[RunManager] The run is over; StartNewPlanningPhase ignored.");
+                return;
+            }
+
             if (currentState != RunState.Planning) {
                 // A3: rounds are survive-the-timer, not kill-based. When the wave timer
                 // has elapsed, advance to the next round; otherwise just return to Planning.
                 if (WaveManager.Instance != null && WaveManager.Instance.IsWaveTimerComplete()) {
+                    // B3: the Day's end is dusk: supper first, then the dusk check decides.
+                    if (currentState == RunState.GrowthAndThreat) {
+                        BeginDusk();
+                        return;
+                    }
                     StartNewRound();
                 }
                 else {
                     SetState(RunState.Planning);
                 }
             }
+        }
+
+        void EnsureSupperRunner() {
+            if (supperRunner != null) return;
+            supperRunner = GetComponent<SupperRunner>();
+            if (supperRunner == null) supperRunner = gameObject.AddComponent<SupperRunner>();
+        }
+
+        void BeginDusk() {
+            Debug.Log($"[RunManager] Dusk of round {currentRoundNumber}: supper.");
+            SetState(RunState.Dusk);
+            EnsureSupperRunner();
+            supperRunner.Run(HandleSupperFinished);
+        }
+
+        void HandleSupperFinished(SupperRunner.SupperResult result) {
+            if (currentState != RunState.Dusk) return;
+            StartNewRound();
         }
 
         void StartNewRound() {

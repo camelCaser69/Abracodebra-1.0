@@ -5,6 +5,7 @@ using Abracodabra.Ecosystem.Feeding;
 using Abracodabra.Genes.Components; // ✅ ADDED: For FruitConsumptionHandler
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 using System;
 
 namespace Abracodabra.Ecosystem.Feeding {
@@ -19,8 +20,10 @@ namespace Abracodabra.Ecosystem.Feeding {
         [SerializeField] float manualFeedingRange = 3f;
 
         [Header("State Restrictions")]
-        [Tooltip("If true, only allow feeding during GrowthAndThreat phase. If false, always allow.")]
-        [SerializeField] bool restrictToGrowthPhase = true;
+        [Tooltip("B3: if true, hand-feeding (right-click popup, hover + number key) works only in Planning. " +
+                 "Supper feeds Doris at dusk and the Day is hands off. If false, always allow.")]
+        [FormerlySerializedAs("restrictToGrowthPhase")]
+        [SerializeField] bool restrictToPlanningPhase = true;
 
         [Header("Player Reference")]
         [SerializeField] Transform player;
@@ -99,14 +102,15 @@ namespace Abracodabra.Ecosystem.Feeding {
             if (isSelectingFood)
                 return;
 
-            if (restrictToGrowthPhase) {
+            // B3: hand-feeding belongs to Planning (time is frozen), like every other click since B2.
+            if (restrictToPlanningPhase) {
                 if (RunManager.Instance == null) {
                     if (rightClickThisFrame && debugLog)
                         Debug.Log("[FeedingSystem] RunManager.Instance is null");
                 }
-                else if (RunManager.Instance.CurrentState != RunState.GrowthAndThreat) {
+                else if (RunManager.Instance.CurrentState != RunState.Planning) {
                     if (rightClickThisFrame && debugLog)
-                        Debug.Log($"[FeedingSystem] Wrong state: {RunManager.Instance.CurrentState} (need GrowthAndThreat)");
+                        Debug.Log($"[FeedingSystem] Wrong state: {RunManager.Instance.CurrentState} (need Planning)");
                     return;
                 }
             }
