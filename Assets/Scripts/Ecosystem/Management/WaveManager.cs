@@ -52,6 +52,27 @@ public class WaveManager : MonoBehaviour
             return rules.waves != null && rules.waves.Count > 0 ? rules.waves : wavesSequence;
         }
     }
+
+    // B4: the coming wave for the Planning markers (round 1 = element 0), null when the season has none.
+    public WaveDefinition PeekWaveForRound(int roundNumber)
+    {
+        var waves = ActiveWaves;
+        int index = roundNumber - 1;
+        return waves != null && index >= 0 && index < waves.Count ? waves[index] : null;
+    }
+
+    // B4: seconds of Day time (at x1) from the start of the Day until the first animal of this entry
+    // appears: the wave's spawn tick (spawnTimeNormalized of the Day) plus the entry's own delay.
+    public float SecondsUntilEntryStarts(WaveSpawnEntry entry)
+    {
+        var config = TickManager.Instance?.Config;
+        if (config == null || entry == null) return 0f;
+
+        int baseTicks = Mathf.RoundToInt(config.ticksPerDay * waveDurationInDays * spawnTimeNormalized);
+        int delayTicks = entry.delayAfterSpawnTime > 0f ? Mathf.Max(1, config.ConvertSecondsToTicks(entry.delayAfterSpawnTime)) : 0;
+        return config.ConvertTicksToSeconds(baseTicks + delayTicks);
+    }
+
     // A3: rounds end on a survive-the-timer basis (the wave window elapsed), not on
     // killing every pest. Named honestly to match behavior.
     public bool IsWaveTimerComplete() => currentState == WaveState.Idle && currentWaveIndex >= 0;
@@ -221,6 +242,10 @@ public class WaveManager : MonoBehaviour
         StopCurrentWaveSpawning();
         currentWaveDef = null;
         currentState = WaveState.Idle;
+
+        // B4: the Day's pests leave at dusk so supper and the next Planning start with a clean garden.
+        // Done here in code, not through the scene's deletePreviousWaveAnimals flag.
+        ClearAllActiveAnimals();
 
         if (RunManager.Instance != null)
         {

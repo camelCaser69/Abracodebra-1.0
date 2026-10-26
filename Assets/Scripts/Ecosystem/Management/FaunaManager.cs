@@ -25,6 +25,8 @@ public class FaunaManager : MonoBehaviour
     [Header("Debug")]
     [SerializeField] private bool showBoundsGizmos = false;
 
+    public float OffscreenSpawnMargin => offscreenSpawnMargin;
+
     private List<Coroutine> activeSpawnCoroutines = new List<Coroutine>();
     private Camera mainCamera;
 
@@ -103,11 +105,27 @@ public class FaunaManager : MonoBehaviour
         }
     }
 
+    // B4: waits are in Day time (ticks), not wall-clock seconds, so Space (pause) and Tab (x2) move the
+    // spawns with the Day and the Planning marker's "0:05" stays true. Seconds are converted at the
+    // tick rate (x1), the same unit the marker shows.
+    private IEnumerator WaitDayTicks(float seconds)
+    {
+        var tm = TickManager.Instance;
+        if (tm == null || tm.Config == null) { yield return new WaitForSeconds(seconds); yield break; }
+
+        int ticks = Mathf.Max(1, tm.Config.ConvertSecondsToTicks(seconds));
+        int target = tm.CurrentTick + ticks;
+        while (tm != null && tm.CurrentTick < target)
+        {
+            yield return null;
+        }
+    }
+
     private IEnumerator SpawnWaveEntryCoroutine(WaveSpawnEntry entry, string waveNameForDebug)
     {
         if (entry.delayAfterSpawnTime > 0)
         {
-            yield return new WaitForSeconds(entry.delayAfterSpawnTime);
+            yield return WaitDayTicks(entry.delayAfterSpawnTime);
         }
 
         for (int i = 0; i < entry.spawnCount; i++)
@@ -118,19 +136,22 @@ public class FaunaManager : MonoBehaviour
                 break;
             }
 
-            Vector2 spawnPos = CalculateSpawnPosition(entry.spawnLocationType, entry.spawnRadius);
-            bool isOffscreen = entry.spawnLocationType == WaveSpawnLocationType.Offscreen;
+            Vector2 spawnPos = CalculateSpawnPosition(entry);
+            bool isOffscreen = entry.spawnLocationType == WaveSpawnLocationType.Offscreen ||
+                               entry.spawnLocationType == WaveSpawnLocationType.FixedEntry;
             GameObject spawnedAnimal = SpawnAnimal(entry.animalDefinition, spawnPos, isOffscreen);
 
             if (entry.spawnInterval > 0 && i < entry.spawnCount - 1)
             {
-                yield return new WaitForSeconds(entry.spawnInterval);
+                yield return WaitDayTicks(entry.spawnInterval);
             }
         }
     }
 
-    private Vector2 CalculateSpawnPosition(WaveSpawnLocationType locationType, float radius)
+    private Vector2 CalculateSpawnPosition(WaveSpawnEntry entry)
     {
+        WaveSpawnLocationType locationType = entry.spawnLocationType;
+        float radius = entry.spawnRadius;
         if (mainCamera == null)
         {
             Debug.LogError("[FaunaManager] Missing Main Camera for CalculateSpawnPosition!");
@@ -146,6 +167,10 @@ public class FaunaManager : MonoBehaviour
 
         switch (locationType)
         {
+            case WaveSpawnLocationType.FixedEntry:
+                spawnPos = WaveEntryGeometry.SpawnPoint(mainCamera, entry, offscreenSpawnMargin);
+                break;
+
             case WaveSpawnLocationType.Offscreen:
                 float marginMinX = effectiveCamPos.x - camWidth / 2f - offscreenSpawnMargin;
                 float marginMaxX = effectiveCamPos.x + camWidth / 2f + offscreenSpawnMargin;

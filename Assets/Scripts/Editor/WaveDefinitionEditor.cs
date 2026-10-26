@@ -17,7 +17,7 @@ public class WaveDefinitionEditor : Editor {
         };
         
         spawnList.elementHeightCallback = (int index) => {
-            return EditorGUIUtility.singleLineHeight * 4 + 10;
+            return EditorGUIUtility.singleLineHeight * 5 + 14;
         };
         
         spawnList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) => {
@@ -69,6 +69,14 @@ public class WaveDefinitionEditor : Editor {
             radiusRect.x += 45;
             radiusRect.width -= 45;
             EditorGUI.PropertyField(radiusRect, element.FindPropertyRelative("spawnRadius"), GUIContent.none);
+
+            rect.y += lineHeight + spacing;
+
+            // B4: FixedEntry only: which side of the view, and where along it
+            Rect edgeRect = new Rect(rect.x, rect.y, rect.width * 0.4f, lineHeight);
+            Rect alongRect = new Rect(rect.x + rect.width * 0.42f, rect.y, rect.width * 0.58f, lineHeight);
+            EditorGUI.PropertyField(edgeRect, element.FindPropertyRelative("entryEdge"), GUIContent.none);
+            EditorGUI.PropertyField(alongRect, element.FindPropertyRelative("entryAlong"), GUIContent.none);
         };
         
         spawnList.onAddCallback = (ReorderableList list) => {

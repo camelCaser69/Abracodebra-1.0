@@ -59,6 +59,8 @@ namespace Abracodabra.UI.Toolkit {
   UIDorisBellyController dorisBellyController; // B3: belly pips above Doris
   UIRunEndOverlayController runEndOverlay;     // B3: won / lost, why, Restart
   public UIDorisBellyController DorisBelly => dorisBellyController;
+  UIWaveMarkersController waveMarkers;         // B4: the coming wave's entry points, in Planning
+  public UIWaveMarkersController WaveMarkers => waveMarkers;
   public UIRunEndOverlayController RunEndOverlay => runEndOverlay;
 
   // Garden view (Planning): the full-screen seed editor hides the world, so planting needs a way to see it.
@@ -139,10 +141,12 @@ namespace Abracodabra.UI.Toolkit {
   void LateUpdate() {
    // B3: after the camera has moved this frame
    dorisBellyController?.Refresh();
+   waveMarkers?.Refresh();
   }
 
   void OnDestroy() {
    dorisBellyController?.Dispose();
+   waveMarkers?.Dispose();
    IsPlanningPanelOpen = false;
 
    InventoryService.OnInventoryChanged -= HandleInventoryServiceChanged;
@@ -285,6 +289,11 @@ namespace Abracodabra.UI.Toolkit {
    if (doris != null && hudPanel != null) {
     dorisBellyController = new UIDorisBellyController();
     dorisBellyController.Initialize(hudPanel, doris);
+   }
+
+   if (hudPanel != null) {
+    waveMarkers = new UIWaveMarkersController();
+    waveMarkers.Initialize(hudPanel);
    }
 
    runEndOverlay = new UIRunEndOverlayController();

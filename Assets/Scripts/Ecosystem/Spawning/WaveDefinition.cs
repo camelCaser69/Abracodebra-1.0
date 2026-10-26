@@ -6,7 +6,17 @@ public enum WaveSpawnLocationType
 {
     GlobalSpawnArea,
     RandomNearPlayer,
-    Offscreen
+    Offscreen,
+    FixedEntry   // B4: a fixed point just off one edge of the view (WaveEntryGeometry); no RNG, shown on the map in Planning
+}
+
+// B4: which side of the view a FixedEntry group walks in from.
+public enum WaveEntryEdge
+{
+    West,
+    East,
+    North,
+    South
 }
 
 // Class WaveSpawnEntry remains the same
@@ -31,6 +41,11 @@ public class WaveSpawnEntry
     [Tooltip("Radius used for spawning (e.g., if Spawn Location Type is RandomNearPlayer).")]
     [Min(0)]
     public float spawnRadius = 5f;
+    [Tooltip("FixedEntry only: the side of the view the group walks in from.")]
+    public WaveEntryEdge entryEdge = WaveEntryEdge.West;
+    [Tooltip("FixedEntry only: where along that side, 0 = bottom / left end, 1 = top / right end.")]
+    [Range(0f, 1f)]
+    public float entryAlong = 0.5f;
 }
 
 // WaveDefinition ScriptableObject is simplified further
