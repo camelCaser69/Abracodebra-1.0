@@ -102,6 +102,10 @@ namespace Abracodabra.Ecosystem.Feeding {
             if (isSelectingFood)
                 return;
 
+            // B3 garden view: Doris is hidden behind the seed editor, so the mouse is on the UI.
+            if (GameUIManager.IsPlanningPanelOpen)
+                return;
+
             // B3: hand-feeding belongs to Planning (time is frozen), like every other click since B2.
             if (restrictToPlanningPhase) {
                 if (RunManager.Instance == null) {

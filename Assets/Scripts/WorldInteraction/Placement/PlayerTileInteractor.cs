@@ -38,6 +38,10 @@ public sealed class PlayerTileInteractor : MonoBehaviour {
         if (FoodSelectionPopup.IsBlockingInput)
             return;
 
+        // B3 garden view: while the seed editor covers the world, a click belongs to the UI.
+        if (GameUIManager.IsPlanningPanelOpen)
+            return;
+
         // B0: the click that hits the timing circle belongs to the minigame, not to the world.
         // Without this guard it also reached HandleSeedPlanting and planted a second time.
         if (IsMinigameActive())

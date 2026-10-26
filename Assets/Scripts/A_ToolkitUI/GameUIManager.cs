@@ -61,6 +61,14 @@ namespace Abracodabra.UI.Toolkit {
   public UIDorisBellyController DorisBelly => dorisBellyController;
   public UIRunEndOverlayController RunEndOverlay => runEndOverlay;
 
+  // Garden view (Planning): the full-screen seed editor hides the world, so planting needs a way to see it.
+  const KeyCode GardenViewKey = KeyCode.G;
+  bool gardenView;
+  VisualElement gardenViewBar;
+  /// <summary>True while the Planning panel covers the world: world clicks and hand-feeding ignore the mouse.</summary>
+  public static bool IsPlanningPanelOpen { get; private set; }
+  public bool IsGardenView => gardenView;
+
   PlayerHungerSystem playerHungerSystem;
 
   MonoBehaviour dorisHungerSystemRef;
@@ -119,6 +127,12 @@ namespace Abracodabra.UI.Toolkit {
    if (FoodSelectionPopup.IsBlockingInput)
     return;
 
+   // Garden view: G switches between the seed editor and the garden while Planning.
+   if (Input.GetKeyDown(GardenViewKey) && !IsTextFieldFocused() &&
+       RunManager.HasInstance && RunManager.Instance.CurrentState == RunState.Planning) {
+    SetGardenView(!gardenView);
+   }
+
    hotbarController.HandleInput();
   }
 
@@ -129,6 +143,7 @@ namespace Abracodabra.UI.Toolkit {
 
   void OnDestroy() {
    dorisBellyController?.Dispose();
+   IsPlanningPanelOpen = false;
 
    InventoryService.OnInventoryChanged -= HandleInventoryServiceChanged;
    InventoryService.Unregister();
@@ -408,7 +423,75 @@ namespace Abracodabra.UI.Toolkit {
    buttonContainer.Add(startDayButton);
    planningPanel.Add(buttonContainer);
 
+   CreateGardenViewControls(buttonContainer);
+
    Debug.Log("[GameUIManager] Start Day button created");
+  }
+
+  // Garden view: a "VIEW GARDEN (G)" button above START DAY in the seed editor, and in the garden
+  // a bar above the hotbar with "EDIT SEEDS (G)" and a second START DAY.
+  void CreateGardenViewControls(VisualElement startDayContainer) {
+   var viewGardenButton = MakePlanningBarButton("VIEW GARDEN (G)", new Color(0.24f, 0.30f, 0.23f));
+   viewGardenButton.style.marginBottom = 10;
+   viewGardenButton.clicked += () => SetGardenView(true);
+   startDayContainer.Insert(0, viewGardenButton);
+
+   gardenViewBar = new VisualElement { name = "GardenViewBar" };
+   gardenViewBar.style.position = Position.Absolute;
+   gardenViewBar.style.bottom = 132; // above the hotbar and its tooltip label
+   gardenViewBar.style.left = Length.Percent(50);
+   gardenViewBar.style.translate = new Translate(Length.Percent(-50), 0);
+   gardenViewBar.style.flexDirection = FlexDirection.Row;
+   gardenViewBar.style.alignItems = Align.Center;
+   gardenViewBar.style.display = DisplayStyle.None;
+
+   var editSeedsButton = MakePlanningBarButton("EDIT SEEDS (G)", new Color(0.24f, 0.30f, 0.23f));
+   editSeedsButton.clicked += () => SetGardenView(false);
+   var startDayHere = MakePlanningBarButton("▶ START DAY", new Color(0.2f, 0.7f, 0.3f));
+   startDayHere.style.marginLeft = 12;
+   startDayHere.clicked += OnStartDayClicked;
+
+   gardenViewBar.Add(editSeedsButton);
+   gardenViewBar.Add(startDayHere);
+   rootElement.Add(gardenViewBar);
+  }
+
+  static Button MakePlanningBarButton(string text, Color background) {
+   var button = new Button { text = text };
+   button.style.fontSize = 18;
+   button.style.paddingTop = 9;
+   button.style.paddingBottom = 9;
+   button.style.paddingLeft = 22;
+   button.style.paddingRight = 22;
+   button.style.backgroundColor = background;
+   button.style.color = Color.white;
+   button.style.unityFontStyleAndWeight = FontStyle.Bold;
+   button.style.borderTopLeftRadius = 8;
+   button.style.borderTopRightRadius = 8;
+   button.style.borderBottomLeftRadius = 8;
+   button.style.borderBottomRightRadius = 8;
+   button.style.borderLeftWidth = 0;
+   button.style.borderRightWidth = 0;
+   button.style.borderTopWidth = 0;
+   button.style.borderBottomWidth = 0;
+   return button;
+  }
+
+  /// <summary>Planning only: show the garden (HUD + hotbar, world clicks on) or the seed editor.</summary>
+  public void SetGardenView(bool showGarden) {
+   bool planning = RunManager.HasInstance && RunManager.Instance.CurrentState == RunState.Planning;
+   if (!planning) return;
+
+   gardenView = showGarden;
+   if (planningPanel != null) planningPanel.style.display = showGarden ? DisplayStyle.None : DisplayStyle.Flex;
+   if (hudPanel != null) hudPanel.style.display = showGarden ? DisplayStyle.Flex : DisplayStyle.None;
+   if (gardenViewBar != null) gardenViewBar.style.display = showGarden ? DisplayStyle.Flex : DisplayStyle.None;
+   IsPlanningPanelOpen = !showGarden;
+  }
+
+  bool IsTextFieldFocused() {
+   var focused = rootElement?.focusController?.focusedElement as VisualElement;
+   return focused != null && (focused is TextField || focused.GetFirstAncestorOfType<TextField>() != null);
   }
 
   void SubscribeToEvents() {
@@ -891,9 +974,16 @@ namespace Abracodabra.UI.Toolkit {
   void ShowPlanningUI() {
    if (planningPanel != null) planningPanel.style.display = DisplayStyle.Flex;
    if (hudPanel != null) hudPanel.style.display = DisplayStyle.None;
+   // Every Planning phase opens on the seed editor; G shows the garden.
+   gardenView = false;
+   if (gardenViewBar != null) gardenViewBar.style.display = DisplayStyle.None;
+   IsPlanningPanelOpen = planningPanel != null;
   }
 
   void ShowHUDUI() {
+   gardenView = false;
+   if (gardenViewBar != null) gardenViewBar.style.display = DisplayStyle.None;
+   IsPlanningPanelOpen = false;
    if (planningPanel != null) planningPanel.style.display = DisplayStyle.None;
    if (hudPanel != null) hudPanel.style.display = DisplayStyle.Flex;
   }
