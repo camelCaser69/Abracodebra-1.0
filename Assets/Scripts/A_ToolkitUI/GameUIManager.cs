@@ -68,6 +68,8 @@ namespace Abracodabra.UI.Toolkit {
   public UIPhaseBannerController PhaseBanner => phaseBanner;
   UIDuskLedgerController duskLedger;            // B6: the Day in three lines, after supper
   public UIDuskLedgerController DuskLedger => duskLedger;
+  public UISeedEditorController SeedEditor => seedEditorController;   // B7: for checks ("reads as" text)
+  public UISpecSheetController SpecSheet => specSheetController;
 
   // Garden view (Planning): the full-screen seed editor hides the world, so planting needs a way to see it.
   const KeyCode GardenViewKey = KeyCode.G;

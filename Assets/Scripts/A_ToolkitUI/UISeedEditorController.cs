@@ -32,6 +32,10 @@ namespace Abracodabra.UI.Toolkit {
         private bool isInteractable = true;
         private Label lockLabel;
 
+        // B7: "Reads as" sentence under the strand (code-built, sits right after the active sequence)
+        private Label readsAsHeader;
+        private Label readsAsLabel;
+
         public bool IsInteractable => isInteractable;
 
         public void Initialize(VisualElement seedContainer, VisualElement passiveContainer, VisualElement activeContainer, VisualTreeAsset slotTemplate) {
@@ -42,7 +46,41 @@ namespace Abracodabra.UI.Toolkit {
 
             CreateNameEditor();
             CreateColorPicker();
+            CreateReadsAs();
         }
+
+        private void CreateReadsAs() {
+            if (activeSequenceContainer == null || activeSequenceContainer.parent == null) return;
+
+            readsAsHeader = new Label("READS AS");
+            readsAsHeader.name = "seed-editor-reads-as-header";
+            readsAsHeader.AddToClassList("section-header-small");
+            readsAsLabel = UISpecSheetController.CreateReadsAsLabel("seed-editor-reads-as");
+
+            var parent = activeSequenceContainer.parent;
+            int at = parent.IndexOf(activeSequenceContainer) + 1;
+            parent.Insert(at, readsAsHeader);
+            parent.Insert(at + 1, readsAsLabel);
+            UpdateReadsAs();
+        }
+
+        private void UpdateReadsAs() {
+            if (readsAsLabel == null || readsAsHeader == null) return;
+
+            var state = currentSeedItem?.SeedRuntimeState;
+            if (state == null) {
+                readsAsHeader.style.display = DisplayStyle.None;
+                readsAsLabel.style.display = DisplayStyle.None;
+                return;
+            }
+
+            readsAsLabel.text = UISpecSheetController.BuildReadsAs(state);
+            readsAsHeader.style.display = DisplayStyle.Flex;
+            readsAsLabel.style.display = DisplayStyle.Flex;
+        }
+
+        /// <summary>The sentence currently shown under the strand ("" when no seed is loaded). For checks.</summary>
+        public string ReadsAsText => (readsAsLabel != null && readsAsLabel.style.display != DisplayStyle.None) ? readsAsLabel.text : "";
 
         public void SetInteractable(bool interactable) {
             isInteractable = interactable;
@@ -209,6 +247,8 @@ namespace Abracodabra.UI.Toolkit {
                 sequenceRow.Add(payloadWrapped);
             }
 
+            UpdateReadsAs();
+
             // Re-apply lock state after rebuilding UI
             if (!isInteractable) {
                 SetInteractable(false);
@@ -367,6 +407,8 @@ namespace Abracodabra.UI.Toolkit {
             emptySeedSlot.AddToClassList("gene-slot--seed");
             emptySeedSlot.name = "seed-drop-slot";
             seedDropSlotContainer.Add(emptySeedSlot);
+
+            UpdateReadsAs();
         }
 
         public bool HasSeedLoaded() => currentSeedItem != null;
